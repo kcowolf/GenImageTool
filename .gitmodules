@@ -1,0 +1,8 @@
+[submodule "external/mustache"]
+	path = external/mustache
+	url = https://github.com/kainjow/Mustache.git
+	branch = master
+[submodule "tclap"]
+	path = external/tclap
+	url = git://git.code.sf.net/p/tclap/code
+	branch = 1.2

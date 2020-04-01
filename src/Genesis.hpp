@@ -1,0 +1,8 @@
+#ifndef GENESIS_HPP
+#define GENESIS_HPP
+
+#define PALETTE_MAX_COLORS 16
+#define TILE_PIXEL_WIDTH 8
+#define TILE_PIXEL_HEIGHT 8
+
+#endif
