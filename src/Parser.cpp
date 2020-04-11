@@ -15,16 +15,19 @@ namespace GenImageTool
 
     // palette PALETTE_NAME
     // palette_color PALETTE_NAME RED GREEN BLUE
+    // palette_collection PALETTE_COLLECTION_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME (use ? to leave palette undefined, collection name must not match any palette name)
 
     // tileset TILESET_NAME
 
-    // tilemap TILEMAP_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y TILE_W TILE_H
+    // tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
 
+    // sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
+
+    // scene_tilemap TILEMAP_NAME IMAGE_NAME SCENE_NAME TILESET_NAME X Y TILE_W TILE_H
+
+    // NOT YET IMPLEMENTED:
     // tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H
     // tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y
-
-    // sprite SPRITE_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y TILE_W TILE_H
-
     // sprite_array SPRITEARRAY_NAME TILE_W TILE_H
     // sprite_array_entry SPRITEARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y
 
@@ -32,13 +35,15 @@ namespace GenImageTool
     {
         m_lineCounter = 0;
 
-        m_commands["image"] = CommandTableEntry{ -1, "" };
-        m_commands["out_h"] = CommandTableEntry{ 3, "out_h \"filename.h\" INCLUDE_GUARD" };
-        m_commands["out_c"] = CommandTableEntry{ 2, "out_c \"filename.c\"" };
-        m_commands["palette"] = CommandTableEntry{ 2, "palette PALETTE_NAME" };
-        m_commands["palette_color"] = CommandTableEntry{ 5, "palette_color PALETTE_NAME RED GREEN BLUE" };
-        m_commands["tilemap"] = CommandTableEntry{ 9, "tilemap TILEMAP_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y TILE_W TILE_H" };
-        m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME" };
+        m_commands["image"] = CommandTableEntry{ -1, "", &Parser::parseImage };
+        m_commands["out_h"] = CommandTableEntry{ 3, "out_h \"filename.h\" INCLUDE_GUARD", &Parser::parseOutputHFile };
+        m_commands["out_c"] = CommandTableEntry{ 2, "out_c \"filename.c\"", &Parser::parseOutputCFile };
+        m_commands["palette"] = CommandTableEntry{ 2, "palette PALETTE_NAME", &Parser::parsePalette };
+        m_commands["palette_color"] = CommandTableEntry{ 5, "palette_color PALETTE_NAME RED GREEN BLUE", &Parser::parsePaletteColor };
+        m_commands["palette_collection"] = CommandTableEntry{ 6, "palette_collection PALETTE_COLLECTION_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME (use ? to leave palette undefined, collection name must not match any palette name)", &Parser::parsePaletteCollection };
+        m_commands["sprite"] = CommandTableEntry{ 9, "sprite TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseSprite };
+        m_commands["tilemap"] = CommandTableEntry{ 9, "tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseTileMap };
+        m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME", &Parser::parseTileSet };
     }
 
     GenesisObjects Parser::parse
@@ -87,38 +92,7 @@ namespace GenImageTool
 
                 try
                 {
-                    if (tokens[0] == "image")
-                    {
-                        parseImage(tokens);
-                    }
-                    else if (tokens[0] == "out_c")
-                    {
-                        parseOutputCFile(tokens);
-                    }
-                    else if (tokens[0] == "out_h")
-                    {
-                        parseOutputHFile(tokens);
-                    }
-                    else if (tokens[0] == "palette")
-                    {
-                        parsePalette(tokens);
-                    }
-                    else if (tokens[0] == "palette_color")
-                    {
-                        parsePaletteColor(tokens);
-                    }
-                    else if (tokens[0] == "sprite")
-                    {
-                        parseSprite(tokens);
-                    }
-                    else if (tokens[0] == "tilemap")
-                    {
-                        parseTileMap(tokens);
-                    }
-                    else if (tokens[0] == "tileset")
-                    {
-                        parseTileSet(tokens);
-                    }
+                    (this->*(command->second.handler))(tokens);
                 }
                 catch (const std::runtime_error& err)
                 {
@@ -144,7 +118,10 @@ namespace GenImageTool
         return prefix;
     }
 
-    Image& Parser::getImage(const std::string& name)
+    Image& Parser::getImage
+        (
+        const std::string& name
+        )
     {
         std::map<std::string, Image>::iterator image = m_genesisObjects.images.find(name);
 
@@ -156,7 +133,10 @@ namespace GenImageTool
         return image->second;
     }
 
-    Palette& Parser::getPalette(const std::string& name)
+    Palette& Parser::getPalette
+        (
+        const std::string& name
+        )
     {
         std::map<std::string, Palette>::iterator palette = m_genesisObjects.palettes.find(name);
 
@@ -168,7 +148,27 @@ namespace GenImageTool
         return palette->second;
     }
 
-    TileSet& Parser::getTileSet(const std::string& name)
+    bool Parser::getPaletteCollection
+        (
+        const std::string& name,
+        std::map<std::size_t, Palette&>& paletteCollection
+        )
+    {
+        std::map<std::string, std::map<std::size_t, Palette&>>::iterator it = m_genesisObjects.paletteCollections.find(name);
+
+        if (it == m_genesisObjects.paletteCollections.end())
+        {
+            return false;
+        }
+
+        paletteCollection = it->second;
+        return true;
+    }
+
+    TileSet& Parser::getTileSet
+        (
+        const std::string& name
+        )
     {
         std::map<std::string, TileSet>::iterator tileSet = m_genesisObjects.tileSets.find(name);
 
@@ -249,6 +249,11 @@ namespace GenImageTool
             throw std::runtime_error("Palette " + tokens[1] + " already exists.");
         }
 
+        if (m_genesisObjects.paletteCollections.find(tokens[1]) != m_genesisObjects.paletteCollections.end())
+        {
+            throw std::runtime_error("Palette name " + tokens[1] + " conflicts with a palette collection.");
+        }
+
         m_genesisObjects.palettes[tokens[1]] = Palette();
     }
 
@@ -263,6 +268,35 @@ namespace GenImageTool
         palette.addColor(color);
     }
 
+    void Parser::parsePaletteCollection
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        if (m_genesisObjects.paletteCollections.find(tokens[1]) != m_genesisObjects.paletteCollections.end())
+        {
+            throw std::runtime_error("Palette collection " + tokens[1] + " already exists.");
+        }
+
+        if (m_genesisObjects.palettes.find(tokens[1]) != m_genesisObjects.palettes.end())
+        {
+            throw std::runtime_error("Palette collection name " + tokens[1] + " conflicts with a palette.");
+        }
+
+        std::map<std::size_t, Palette&> paletteCollection;
+
+        for (std::size_t i = 0; i < PALETTES_PER_SCENE; i++)
+        {
+            if (tokens[i + 2] != "?")
+            {
+                Palette& palette = getPalette(tokens[i + 2]);
+                paletteCollection.insert(std::pair<std::size_t, Palette&>(i << TILE_PAL_BITSHIFT, palette));
+            }
+        }
+
+        m_genesisObjects.paletteCollections.insert(std::pair<std::string, std::map<std::size_t, Palette&>>(tokens[1], paletteCollection));
+    }
+
     void Parser::parseSprite
         (
         const std::vector<std::string>& tokens
@@ -274,7 +308,6 @@ namespace GenImageTool
         }
 
         Image& image = getImage(tokens[2]);
-        Palette& palette = getPalette(tokens[3]);
         TileSet& tileSet = getTileSet(tokens[4]);
 
         uint16_t x = std::stoi(tokens[5]);
@@ -282,7 +315,19 @@ namespace GenImageTool
         uint16_t tileW = std::stoi(tokens[7]);
         uint16_t tileH = std::stoi(tokens[8]);
 
-        Sprite sprite = readSprite(image, palette, tileSet, x, y, tileW, tileH);
+        std::map<std::size_t, Palette&> palettes;
+        bool addColors = true;
+
+        if (getPaletteCollection(tokens[3], palettes))
+        {
+            addColors = false;
+        }
+        else
+        {
+            palettes.insert(std::pair<std::size_t, Palette&>(0, getPalette(tokens[3])));
+        }
+
+        Sprite sprite = readSprite(image, palettes, tileSet, x, y, tileW, tileH, addColors);
         m_genesisObjects.sprites.insert(std::pair<std::string, Sprite>(tokens[1], sprite));
     }
 
@@ -304,7 +349,6 @@ namespace GenImageTool
         }
 
         Image& image = getImage(tokens[2]);
-        Palette& palette = getPalette(tokens[3]);
         TileSet& tileSet = getTileSet(tokens[4]);
 
         uint16_t x = std::stoi(tokens[5]);
@@ -312,7 +356,19 @@ namespace GenImageTool
         uint16_t tileW = std::stoi(tokens[7]);
         uint16_t tileH = std::stoi(tokens[8]);
 
-        TileMap tileMap = readTileMap(image, palette, tileSet, x, y, tileW, tileH);
+        std::map<std::size_t, Palette&> palettes;
+        bool addColors = true;
+
+        if (getPaletteCollection(tokens[3], palettes))
+        {
+            addColors = false;
+        }
+        else
+        {
+            palettes.insert(std::pair<std::size_t, Palette&>(0, getPalette(tokens[3])));
+        }
+
+        TileMap tileMap = readTileMap(image, palettes, tileSet, x, y, tileW, tileH, addColors);
         m_genesisObjects.tileMaps.insert(std::pair<std::string, TileMap>(tokens[1], tileMap));
     }
 
@@ -339,12 +395,13 @@ namespace GenImageTool
     Sprite Parser::readSprite
         (
         Image& image,
-        Palette& palette,
+        std::map<std::size_t, Palette&>& palettes,
         TileSet& tileSet,
         uint16_t x,
         uint16_t y,
         uint16_t tileW,
-        uint16_t tileH
+        uint16_t tileH,
+        bool addColors
         )
     {
         Sprite sprite{ tileW, tileH };
@@ -353,9 +410,30 @@ namespace GenImageTool
         {
             for (int j = 0; j < tileH; j++)
             {
-                std::string tile = image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), palette);
-                uint16_t tileIndex = tileSet.getTileIndex(tile);
-                sprite.addTileIndex(tileIndex);
+                bool added = false;
+
+                for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
+                {
+                    std::string tile;
+                    if (image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), it->second, addColors, tile))
+                    {
+                        std::size_t tileIndex;
+                        if (!tileSet.find(tile, tileIndex))
+                        {
+                            tileIndex = tileSet.addTile(tile);
+                        }
+
+                        tileIndex = tileIndex | it->first;
+
+                        sprite.addTileIndex(tileIndex);
+                        added = true;
+                    }
+                }
+
+                if (!added)
+                {
+                    throw std::runtime_error("Failed to add tile to sprite.  If using palette collection, make sure all colors in palettes are specified.");
+                }
             }
         }
 
@@ -365,12 +443,13 @@ namespace GenImageTool
     TileMap Parser::readTileMap
         (
         Image& image,
-        Palette& palette,
+        std::map<std::size_t, Palette&>& palettes,
         TileSet& tileSet,
         uint16_t x,
         uint16_t y,
         uint16_t tileW,
-        uint16_t tileH
+        uint16_t tileH,
+        bool addColors
         )
     {
         TileMap tileMap{ tileW, tileH };
@@ -379,137 +458,33 @@ namespace GenImageTool
         {
             for (int i = 0; i < tileW; i++)
             {
-                std::string tile = image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), palette);
-                uint16_t tileIndex = tileSet.getTileIndex(tile);
-                tileMap.addTileIndex(tileIndex);
+                bool added = false;
+
+                for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
+                {
+                    std::string tile;
+                    if (image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), it->second, addColors, tile))
+                    {
+                        std::size_t tileIndex;
+                        if (!tileSet.find(tile, tileIndex))
+                        {
+                            tileIndex = tileSet.addTile(tile);
+                        }
+
+                        tileIndex = tileIndex | it->first;
+
+                        tileMap.addTileIndex(tileIndex);
+                        added = true;
+                    }
+                }
+
+                if (!added)
+                {
+                    throw std::runtime_error("Failed to add tile to tilemap.  If using palette collection, make sure all colors in palettes are specified.");
+                }
             }
         }
 
         return tileMap;
     }
-
-    /*void Parser::writePalette
-        (
-        std::ofstream& hFile,
-        std::ofstream& cFile,
-        const std::string& name,
-        const Palette& palette
-        )
-    {
-        hFile << std::endl;
-        hFile << "extern const u16 " << name << "[16];" << std::endl;
-
-        cFile << std::endl;
-        cFile << "const u16 " << name << "[16] =" << std::endl;
-        cFile << "{" << std::endl;
-
-        for (int i = 0; i < PALETTE_MAX_COLORS; i++)
-        {
-            if (i < palette.getSize())
-            {
-                cFile << "    0x" << palette.getColor(i).getString();
-            }
-            else
-            {
-                cFile << "    0x0000";
-            }
-
-            if (i != PALETTE_MAX_COLORS - 1)
-            {
-                cFile << ",";
-            }
-            cFile << std::endl;
-        }
-
-        cFile << "};" << std::endl;
-    }
-
-    void Parser::writeTileMap
-        (
-        std::ofstream& hFile,
-        std::ofstream& cFile,
-        const std::string& name,
-        const TileMap& tileMap
-        )
-    {
-        hFile << std::endl;
-        hFile << "#define " << name << "_TILE_WIDTH " << tileMap.getTileWidth() << std::endl;
-        hFile << "#define " << name << "_TILE_HEIGHT " << tileMap.getTileHeight() << std::endl;
-        hFile << "#define " << name << "_PIXEL_WIDTH " << tileMap.getTileWidth() * TILE_PIXEL_WIDTH << std::endl;
-        hFile << "#define " << name << "_PIXEL_HEIGHT " << tileMap.getTileHeight() * TILE_PIXEL_HEIGHT << std::endl;
-        hFile << "#define " << name << "_TILE_COUNT " << tileMap.getTileWidth() * tileMap.getTileHeight() << std::endl;
-        hFile << "extern const u16 " << name << "[" << name << "_TILE_COUNT];" << std::endl;
-
-        cFile << std::endl;
-        cFile << "const u16 " << name << "[" << name << "_TILE_COUNT] =" << std::endl;
-        cFile << "{" << std::endl;
-
-        for (std::size_t j = 0; j < tileMap.getTileHeight(); j++)
-        {
-            cFile << "    ";
-
-            for (std::size_t i = 0; i < tileMap.getTileWidth(); i++)
-            {
-                cFile << tileMap.getTileIndex(i, j);
-                if ((i + 1) * (j + 1) != (tileMap.getTileWidth() * tileMap.getTileHeight()))
-                {
-                    cFile << ",";
-
-                    if (i != tileMap.getTileWidth() - 1)
-                    {
-                        cFile << " ";
-                    }
-                }
-            }
-
-            cFile << std::endl;
-        }
-
-        cFile << "};" << std::endl;
-    }
-
-    void Parser::writeTileSet
-        (
-        std::ofstream& hFile,
-        std::ofstream& cFile,
-        const std::string& name,
-        const TileSet& tileSet
-        )
-    {
-        hFile << std::endl;
-        hFile << "#define " << name << "_TILE_COUNT " << tileSet.getSize() << std::endl;
-        hFile << "extern const u32 " << name << "[" << name << "_TILE_COUNT][" << TILE_PIXEL_HEIGHT << "];" << std::endl;
-
-        cFile << std::endl;
-        cFile << "const u32 " << name << "[" << name << "_TILE_COUNT][" << TILE_PIXEL_HEIGHT << "] =" << std::endl;
-        cFile << "{" << std::endl;
-
-        for (std::size_t j = 0; j < tileSet.getSize(); j++)
-        {
-            cFile << "    {" << std::endl;
-
-            std::string tile = tileSet.getTile(j);
-
-            for (std::size_t i = 0; i < TILE_PIXEL_HEIGHT; i++)
-            {
-                cFile << "        0x" << tile.substr(i * TILE_PIXEL_WIDTH, TILE_PIXEL_WIDTH);
-                if (i != TILE_PIXEL_HEIGHT - 1)
-                {
-                    cFile << ",";
-                }
-
-                cFile << std::endl;
-            }
-
-            cFile << "    }";
-            if (j != tileSet.getSize() - 1)
-            {
-                cFile << ",";
-            }
-
-            cFile << std::endl;
-        }
-
-        cFile << "};" << std::endl;
-    }*/
 }

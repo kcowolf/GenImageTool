@@ -77,12 +77,14 @@ namespace GenImageTool
 		return *this;
 	}
 
-	std::string Image::readTile
+	bool Image::readTile
 		(
 		unsigned int x,
 		unsigned int y,
-		Palette& palette
-		)
+		Palette& palette,
+		bool addColors,
+		std::string& tile
+		) const
 	{
 		if (x + TILE_PIXEL_WIDTH - 1 >= (unsigned int)m_surface->w || y + TILE_PIXEL_HEIGHT - 1 >= (unsigned int)m_surface->h)
 		{
@@ -96,11 +98,25 @@ namespace GenImageTool
 			for (unsigned int i = x; i < x + TILE_PIXEL_WIDTH; i++)
 			{
 				Color color = getPixel(i, j);
-				stringstream << std::hex << palette.getColorIndex(color);
+				std::size_t colorIndex;
+				if (!palette.find(color, colorIndex))
+				{
+					if (addColors)
+					{
+						colorIndex = palette.addColor(color);
+					}
+					else
+					{
+						return false;
+					}
+				}
+
+				stringstream << std::hex << colorIndex;
 			}
 		}
 
-		return stringstream.str();
+		tile = stringstream.str();
+		return true;
 	}
 
 	Color Image::getPixel

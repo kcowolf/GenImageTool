@@ -9,20 +9,21 @@ namespace GenImageTool
 	class Palette
 	{
 	public:
-		void addColor
+		std::size_t addColor
 			(
-			Color color
+			const Color& color
 			);
+
+		bool find
+			(
+			const Color& color,
+			std::size_t& index
+			) const;
 
 		Color getColor
 			(
 			std::size_t index
 			) const;
-
-		std::size_t getColorIndex
-			(
-			Color color
-			);
 
 		std::size_t getSize() const;
 

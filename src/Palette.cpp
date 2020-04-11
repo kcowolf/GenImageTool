@@ -4,9 +4,9 @@
 
 namespace GenImageTool
 {
-	void Palette::addColor
+	std::size_t Palette::addColor
 		(
-		Color color
+		const Color& color
 		)
 	{
 		m_colors.push_back(color);
@@ -15,6 +15,26 @@ namespace GenImageTool
 		{
 			throw std::runtime_error("Palette has too many colors.");
 		}
+
+		return m_colors.size() - 1;
+	}
+
+	bool Palette::find
+		(
+		const Color& color,
+		std::size_t& index
+		) const
+	{
+		for (std::size_t i = 0; i < m_colors.size(); i++)
+		{
+			if (m_colors[i] == color)
+			{
+				index = i;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	Color Palette::getColor
@@ -28,24 +48,6 @@ namespace GenImageTool
 		}
 
 		return m_colors[index];
-	}
-
-	std::size_t Palette::getColorIndex
-		(
-		Color color
-		)
-	{
-		for (std::size_t i = 0; i < m_colors.size(); i++)
-		{
-			if (m_colors[i] == color)
-			{
-				return i;
-			}
-		}
-
-		addColor(color);
-
-		return m_colors.size() - 1;
 	}
 
 	std::size_t Palette::getSize() const

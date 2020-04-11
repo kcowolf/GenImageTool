@@ -18,6 +18,7 @@ struct GenesisObjects
 
 	std::map<std::string, GenImageTool::Image> images;
 	std::map<std::string, GenImageTool::Palette> palettes;
+	std::map<std::string, std::map<std::size_t, GenImageTool::Palette&>> paletteCollections;
 	std::map<std::string, GenImageTool::Sprite> sprites;
 	std::map<std::string, GenImageTool::TileMap> tileMaps;
 	std::map<std::string, GenImageTool::TileSet> tileSets;

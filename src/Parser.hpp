@@ -26,10 +26,13 @@ namespace GenImageTool
 			);
 
 	private:
+		typedef void (Parser::* CommandHandler) (const std::vector<std::string>& tokens);
+
 		struct CommandTableEntry
 		{
 			int tokenCount;
 			std::string format;
+			CommandHandler handler;
 		};
 
 		static const char COMMENT_CHAR;
@@ -52,6 +55,12 @@ namespace GenImageTool
 		Palette& getPalette
 			(
 			const std::string& name
+			);
+
+		bool getPaletteCollection
+			(
+			const std::string& name,
+			std::map<std::size_t, Palette&>& paletteCollection
 			);
 
 		TileSet& getTileSet
@@ -89,6 +98,11 @@ namespace GenImageTool
 			const std::vector<std::string>& tokens
 			);
 
+		void parsePaletteCollection
+			(
+			const std::vector<std::string>& tokens
+			);
+
 		void parseTileSet
 			(
 			const std::vector<std::string>& tokens
@@ -117,23 +131,25 @@ namespace GenImageTool
 		Sprite readSprite
 			(
 			Image& image,
-			Palette& palette,
+			std::map<std::size_t, Palette&>& palettes,
 			TileSet& tileSet,
 			uint16_t x,
 			uint16_t y,
 			uint16_t tileW,
-			uint16_t tileH
+			uint16_t tileH,
+			bool addColors
 			);
 
 		TileMap readTileMap
 			(
 			Image& image,
-			Palette& palette,
+			std::map<std::size_t, Palette&>& palettes,
 			TileSet& tileSet,
 			uint16_t x,
 			uint16_t y,
 			uint16_t tileW,
-			uint16_t tileH
+			uint16_t tileH,
+			bool addColors
 			);
 	};
 }

@@ -31,12 +31,14 @@ namespace GenImageTool
 			const Image& rhs
 			);
 
-		std::string readTile
+		bool readTile
 			(
 			unsigned int x,
 			unsigned int y,
-			Palette& palette
-			);
+			Palette& palette,
+			bool addColors,
+			std::string& tile
+			) const;
 
 	private:
 		Color getPixel
