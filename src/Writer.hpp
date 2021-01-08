@@ -25,6 +25,17 @@ namespace GenImageTool
 			const std::map<std::string, Palette>& palettes
 			);
 
+		kainjow::mustache::data getSpriteArrayData
+			(
+			const std::string& name,
+			const SpriteArray& spriteArray
+			);
+
+		kainjow::mustache::list getSpriteArrayListData
+			(
+			const std::map<std::string, SpriteArray>& spriteArrays
+			);
+
 		kainjow::mustache::data getSpriteData
 			(
 			const std::string& name,
@@ -36,10 +47,32 @@ namespace GenImageTool
 			const std::map<std::string, Sprite>& sprites
 			);
 
+		kainjow::mustache::data getTileMapArrayData
+			(
+			const std::string& name,
+			const TileMapArray& tileMapArray
+			);
+
+		kainjow::mustache::list getTileMapArrayListData
+			(
+			const std::map<std::string, TileMapArray>& tileMapArrays
+			);
+
+		kainjow::mustache::data getTileMapArrayMapData
+			(
+			const std::string& name,
+			const TileMapArrayMap& tileMapArrayMap
+			);
+
+		kainjow::mustache::list getTileMapArrayMapListData
+			(
+			const std::map<std::string, TileMapArrayMap>& tileMapArrayMaps
+			);
+
 		kainjow::mustache::data getTileMapData
 			(
 			const std::string& name,
-			const TileMap& tileMap
+			const TileMap& tileMapArrayMap
 			);
 
 		kainjow::mustache::list getTileMapListData

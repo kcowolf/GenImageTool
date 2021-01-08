@@ -31,12 +31,20 @@ namespace GenImageTool
 			const Image& rhs
 			);
 
-		bool readTile
+		void readColors
+			(
+			unsigned int x,
+			unsigned int y,
+			unsigned int w,
+			unsigned int h,
+			Palette& palette
+			) const;
+
+		void readTile
 			(
 			unsigned int x,
 			unsigned int y,
 			Palette& palette,
-			bool addColors,
 			std::string& tile
 			) const;
 

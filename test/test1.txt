@@ -1,0 +1,25 @@
+# out_h "filename.h" INCLUDE_GUARD
+out_h "test1.h" TEST1_H
+
+# out_c "filename.c"
+out_c "test1.c"
+
+# image IMAGE_NAME "filename.png" {FIX_COLORS}
+image GFX_IMG_1 "test1.png" FIX_COLORS
+
+# palette PALETTE_NAME
+palette GFX_PAL_1
+
+# palette_color PALETTE_NAME RED GREEN BLUE
+palette_color GFX_PAL_1 224 0 224
+palette_colors GFX_PAL_1 GFX_IMG_1 0 0 16 16
+
+# tileset TILESET_NAME
+tileset GFX_TILESET_1
+
+# tilemap TILEMAP_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y TILE_W TILE_H
+tilemap GFX_TILEMAP_1 GFX_IMG_1 GFX_PAL_1 GFX_TILESET_1 0 0 2 2
+
+# sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
+sprite GFX_SPRITE_1 GFX_IMG_1 GFX_PAL_1 GFX_TILESET_1 0 0 2 2
+

@@ -77,12 +77,41 @@ namespace GenImageTool
 		return *this;
 	}
 
-	bool Image::readTile
+	void Image::readColors
+		(
+		unsigned int x,
+		unsigned int y,
+		unsigned int w,
+		unsigned int h,
+		Palette& palette
+		) const
+	{
+		if (x + w - 1 >= (unsigned int)m_surface->w || y + h - 1 >= (unsigned int)m_surface->h)
+		{
+			throw std::runtime_error("Invalid coordinates specified");
+		}
+
+		for (unsigned int j = y; j < y + h; j++)
+		{
+			for (unsigned int i = x; i < x + w; i++)
+			{
+				Color color = getPixel(i, j);
+				std::size_t colorIndex;
+				if (!palette.find(color, colorIndex))
+				{
+					palette.addColor(color);
+				}
+			}
+		}
+
+		return;
+	}
+
+	void Image::readTile
 		(
 		unsigned int x,
 		unsigned int y,
 		Palette& palette,
-		bool addColors,
 		std::string& tile
 		) const
 	{
@@ -101,14 +130,7 @@ namespace GenImageTool
 				std::size_t colorIndex;
 				if (!palette.find(color, colorIndex))
 				{
-					if (addColors)
-					{
-						colorIndex = palette.addColor(color);
-					}
-					else
-					{
-						return false;
-					}
+					throw std::runtime_error("Color not found in specified palette(s).");
 				}
 
 				stringstream << std::hex << colorIndex;
@@ -116,7 +138,7 @@ namespace GenImageTool
 		}
 
 		tile = stringstream.str();
-		return true;
+		return;
 	}
 
 	Color Image::getPixel
@@ -137,7 +159,7 @@ namespace GenImageTool
 
 		Uint32 pixel;
 
-		Uint8* p = (Uint8*)m_surface->pixels + y * m_surface->pitch + x * bpp;
+		Uint8* p = static_cast<Uint8*>(m_surface->pixels) + y * m_surface->pitch + x * bpp;
 
 		switch (bpp)
 		{

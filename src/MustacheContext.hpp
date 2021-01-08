@@ -19,12 +19,20 @@ namespace GenImageTool
 
             addPartial("h_file", H_FILE_TEMPLATE);
             addPartial("h_palette", H_PALETTE_TEMPLATE);
+            addPartial("h_sprite", H_SPRITE_TEMPLATE);
+            addPartial("h_spritearray", H_SPRITEARRAY_TEMPLATE);
             addPartial("h_tilemap", H_TILEMAP_TEMPLATE);
+            addPartial("h_tilemaparray", H_TILEMAPARRAY_TEMPLATE);
+            addPartial("h_tilemaparraymap", H_TILEMAPARRAYMAP_TEMPLATE);
             addPartial("h_tileset", H_TILESET_TEMPLATE);
 
             addPartial("c_file", C_FILE_TEMPLATE);
             addPartial("c_palette", C_PALETTE_TEMPLATE);
+            addPartial("c_sprite", C_SPRITE_TEMPLATE);
+            addPartial("c_spritearray", C_SPRITEARRAY_TEMPLATE);
             addPartial("c_tilemap", C_TILEMAP_TEMPLATE);
+            addPartial("c_tilemaparray", C_TILEMAPARRAY_TEMPLATE);
+            addPartial("c_tilemaparraymap", C_TILEMAPARRAYMAP_TEMPLATE);
             addPartial("c_tileset", C_TILESET_TEMPLATE);
         }
 

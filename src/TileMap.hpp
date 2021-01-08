@@ -28,6 +28,8 @@ namespace GenImageTool
 
 		std::size_t getTileWidth() const;
 
+		bool operator==(const TileMap& rhs) const;
+
 	private:
 		std::size_t m_tileHeight;
 		std::size_t m_tileWidth;

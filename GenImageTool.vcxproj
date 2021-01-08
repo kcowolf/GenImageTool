@@ -160,7 +160,10 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
+    <ClCompile Include="src\SpriteArray.cpp" />
     <ClCompile Include="src\TileMap.cpp" />
+    <ClCompile Include="src\TileMapArray.cpp" />
+    <ClCompile Include="src\TileMapArrayMap.cpp" />
     <ClCompile Include="src\TileSet.cpp" />
     <ClCompile Include="src\Writer.cpp" />
   </ItemGroup>
@@ -174,7 +177,10 @@
     <ClInclude Include="src\Palette.hpp" />
     <ClInclude Include="src\Parser.hpp" />
     <ClInclude Include="src\Sprite.hpp" />
+    <ClInclude Include="src\SpriteArray.hpp" />
     <ClInclude Include="src\TileMap.hpp" />
+    <ClInclude Include="src\TileMapArray.hpp" />
+    <ClInclude Include="src\TileMapArrayMap.hpp" />
     <ClInclude Include="src\TileSet.hpp" />
     <ClInclude Include="src\Writer.hpp" />
   </ItemGroup>

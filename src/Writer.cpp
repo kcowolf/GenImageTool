@@ -36,7 +36,11 @@ namespace GenImageTool
         data[HEADER_FILENAME_TAG] = genesisObjects.outputHFile.filename().string();
         data[INCLUDE_GUARD_TAG] = genesisObjects.includeGuard;
         data[PALETTES_TAG] = getPaletteListData(genesisObjects.palettes);
+        data[SPRITES_TAG] = getSpriteListData(genesisObjects.sprites);
+        data[SPRITE_ARRAYS_TAG] = getSpriteArrayListData(genesisObjects.spriteArrays);
         data[TILEMAPS_TAG] = getTileMapListData(genesisObjects.tileMaps);
+        data[TILEMAP_ARRAYS_TAG] = getTileMapArrayListData(genesisObjects.tileMapArrays);
+        data[TILEMAP_ARRAY_MAPS_TAG] = getTileMapArrayMapListData(genesisObjects.tileMapArrayMaps);
         data[TILESETS_TAG] = getTileSetListData(genesisObjects.tileSets);
 
         MustacheContext<kainjow::mustache::mustache::string_type> ctx{ &data };
@@ -145,6 +149,50 @@ namespace GenImageTool
         return data;
     }
 
+    kainjow::mustache::data Writer::getSpriteArrayData
+        (
+        const std::string& name,
+        const SpriteArray& spriteArray
+        )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[SPRITE_COUNT_TAG] = std::to_string(spriteArray.getSpriteCount());
+        data[TILE_COUNT_TAG] = std::to_string(spriteArray.getTileHeight() * spriteArray.getTileWidth());
+        data[TILE_WIDTH_TAG] = std::to_string(spriteArray.getTileWidth());
+        data[TILE_HEIGHT_TAG] = std::to_string(spriteArray.getTileHeight());
+        data[PIXEL_WIDTH_TAG] = std::to_string(spriteArray.getTileWidth() * TILE_PIXEL_WIDTH);
+        data[PIXEL_HEIGHT_TAG] = std::to_string(spriteArray.getTileHeight() * TILE_PIXEL_HEIGHT);
+
+        kainjow::mustache::list spritesData;
+
+        for (std::size_t i = 0; i < spriteArray.getSpriteCount(); i++)
+        {
+            kainjow::mustache::data spriteData = getSpriteData(std::string{}, spriteArray.getSprite(i));
+            spriteData[ISLAST_TAG] = (i == spriteArray.getSpriteCount() - 1);
+            spritesData.push_back(spriteData);
+        }
+
+        data[SPRITES_TAG] = spritesData;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getSpriteArrayListData
+        (
+        const std::map<std::string, SpriteArray>& spriteArrays
+        )
+    {
+        kainjow::mustache::list spritesArraysData;
+
+        for (std::map<std::string, SpriteArray>::const_iterator it = spriteArrays.begin(); it != spriteArrays.end(); ++it)
+        {
+            spritesArraysData.push_back(getSpriteArrayData(it->first, it->second));
+        }
+
+        return spritesArraysData;
+    }
+
     kainjow::mustache::list Writer::getSpriteListData
         (
         const std::map<std::string, Sprite>& sprites
@@ -158,6 +206,108 @@ namespace GenImageTool
         }
 
         return spritesData;
+    }
+
+    kainjow::mustache::data Writer::getTileMapArrayData
+        (
+        const std::string& name,
+        const TileMapArray& tileMapArray
+        )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[TILEMAP_COUNT_TAG] = std::to_string(tileMapArray.getTileMapCount());
+        data[TILE_COUNT_TAG] = std::to_string(tileMapArray.getTileHeight() * tileMapArray.getTileWidth());
+        data[TILE_WIDTH_TAG] = std::to_string(tileMapArray.getTileWidth());
+        data[TILE_HEIGHT_TAG] = std::to_string(tileMapArray.getTileHeight());
+        data[PIXEL_WIDTH_TAG] = std::to_string(tileMapArray.getTileWidth() * TILE_PIXEL_WIDTH);
+        data[PIXEL_HEIGHT_TAG] = std::to_string(tileMapArray.getTileHeight() * TILE_PIXEL_HEIGHT);
+
+        kainjow::mustache::list tileMapsData;
+
+        for (std::size_t i = 0; i < tileMapArray.getTileMapCount(); i++)
+        {
+            kainjow::mustache::data tileMapData = getTileMapData(std::string{}, tileMapArray.getTileMap(i));
+            tileMapData[ISLAST_TAG] = (i == tileMapArray.getTileMapCount() - 1);
+
+            tileMapsData.push_back(tileMapData);
+        }
+
+        data[TILEMAPS_TAG] = tileMapsData;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getTileMapArrayListData
+        (
+        const std::map<std::string, TileMapArray>& tileMapArrays
+        )
+    {
+        kainjow::mustache::list tileMapArraysData;
+
+        for (std::map<std::string, TileMapArray>::const_iterator it = tileMapArrays.begin(); it != tileMapArrays.end(); ++it)
+        {
+            tileMapArraysData.push_back(getTileMapArrayData(it->first, it->second));
+        }
+
+        return tileMapArraysData;
+    }
+
+    kainjow::mustache::data Writer::getTileMapArrayMapData
+    (
+        const std::string& name,
+        const TileMapArrayMap& tileMapArrayMap
+    )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[MAP_COUNT_TAG] = std::to_string(tileMapArrayMap.getMapHeight() * tileMapArrayMap.getMapWidth());
+        data[MAP_WIDTH_TAG] = std::to_string(tileMapArrayMap.getMapWidth());
+        data[MAP_HEIGHT_TAG] = std::to_string(tileMapArrayMap.getMapHeight());
+
+        kainjow::mustache::list rows;
+        for (std::size_t j = 0; j < tileMapArrayMap.getMapHeight(); j++)
+        {
+            kainjow::mustache::data rowData;
+            std::stringstream row;
+
+            for (std::size_t i = 0; i < tileMapArrayMap.getMapWidth(); i++)
+            {
+                row << tileMapArrayMap.getTileMapArrayIndex(i, j);
+
+                if (i != tileMapArrayMap.getMapWidth() - 1 || j != tileMapArrayMap.getMapHeight() - 1)
+                {
+                    row << ",";
+                }
+
+                if (i != tileMapArrayMap.getMapWidth() - 1)
+                {
+                    row << " ";
+                }
+            }
+
+            rowData[ROW_TAG] = row.str();
+            rows.push_back(rowData);
+        }
+
+        data[ROWS_TAG] = rows;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getTileMapArrayMapListData
+        (
+        const std::map<std::string, TileMapArrayMap>& tileMapArrayMaps
+        )
+    {
+        kainjow::mustache::list tileMapArrayMapsData;
+
+        for (std::map<std::string, TileMapArrayMap>::const_iterator it = tileMapArrayMaps.begin(); it != tileMapArrayMaps.end(); ++it)
+        {
+            tileMapArrayMapsData.push_back(getTileMapArrayMapData(it->first, it->second));
+        }
+
+        return tileMapArrayMapsData;
     }
 
     kainjow::mustache::data Writer::getTileMapData

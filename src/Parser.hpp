@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <map>
+#include <stdint.h>
 #include <string>
 #include <vector>
 #include "GenesisObjects.hpp"
@@ -10,6 +11,8 @@
 #include "Palette.hpp"
 #include "Sprite.hpp"
 #include "TileMap.hpp"
+#include "TileMapArray.hpp"
+#include "TileMapArrayMap.hpp"
 #include "TileSet.hpp"
 
 namespace GenImageTool
@@ -63,6 +66,16 @@ namespace GenImageTool
 			std::map<std::size_t, Palette&>& paletteCollection
 			);
 
+		SpriteArray& getSpriteArray
+			(
+			const std::string& name
+			);
+
+		TileMapArray& getTileMapArray
+			(
+			const std::string& name
+			);
+
 		TileSet& getTileSet
 			(
 			const std::string& name
@@ -98,6 +111,11 @@ namespace GenImageTool
 			const std::vector<std::string>& tokens
 			);
 
+		void parsePaletteColors
+			(
+			const std::vector<std::string>& tokens
+			);
+
 		void parsePaletteCollection
 			(
 			const std::vector<std::string>& tokens
@@ -118,12 +136,27 @@ namespace GenImageTool
 			const std::vector<std::string>& tokens
 			);
 
+		void parseSpriteArray
+			(
+			const std::vector<std::string>& tokens
+			);
+
+		void parseSpriteArrayEntry
+			(
+			const std::vector<std::string>& tokens
+			);
+
 		void parseTileMapArray
 			(
 			const std::vector<std::string>& tokens
 			);
 
-		void parseSpriteArray
+		void parseTileMapArrayEntry
+			(
+			const std::vector<std::string>& tokens
+			);
+
+		void parseTileMapArrayMap
 			(
 			const std::vector<std::string>& tokens
 			);
@@ -136,8 +169,7 @@ namespace GenImageTool
 			uint16_t x,
 			uint16_t y,
 			uint16_t tileW,
-			uint16_t tileH,
-			bool addColors
+			uint16_t tileH
 			);
 
 		TileMap readTileMap
@@ -148,8 +180,19 @@ namespace GenImageTool
 			uint16_t x,
 			uint16_t y,
 			uint16_t tileW,
-			uint16_t tileH,
-			bool addColors
+			uint16_t tileH
+			);
+
+		TileMapArrayMap readTileMapArrayMap
+			(
+			Image& image,
+			std::map<std::size_t, Palette&>& palettes,
+			TileSet& tileSet,
+			TileMapArray& tileMapArray,
+			uint16_t x,
+			uint16_t y,
+			uint16_t mapW,
+			uint16_t mapH
 			);
 	};
 }

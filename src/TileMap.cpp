@@ -60,4 +60,20 @@ namespace GenImageTool
 	{
 		return m_tileWidth;
 	}
+
+	bool TileMap::operator==(const TileMap& rhs) const
+	{
+		bool result = (m_tileWidth == rhs.m_tileWidth);
+		result = result && (m_tileHeight == rhs.m_tileHeight);
+
+		for (std::size_t j = 0; result && j < m_tileHeight; j++)
+		{
+			for (std::size_t i = 0; result && i < m_tileWidth; i++)
+			{
+				result = result && m_tileIndexes[j * m_tileWidth + i] == rhs.m_tileIndexes[j * m_tileWidth + i];
+			}
+		}
+
+		return result;
+	}
 }
