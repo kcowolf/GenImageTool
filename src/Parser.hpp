@@ -6,13 +6,13 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include "BlockMap.hpp"
 #include "GenesisObjects.hpp"
 #include "Image.hpp"
 #include "Palette.hpp"
 #include "Sprite.hpp"
 #include "TileMap.hpp"
 #include "TileMapArray.hpp"
-#include "TileMapArrayMap.hpp"
 #include "TileSet.hpp"
 
 namespace GenImageTool
@@ -86,6 +86,11 @@ namespace GenImageTool
 			const std::string& line
 			);
 
+		void parseBlockMap
+			(
+			const std::vector<std::string>& tokens
+			);
+
 		void parseImage
 			(
 			const std::vector<std::string>& tokens
@@ -156,9 +161,16 @@ namespace GenImageTool
 			const std::vector<std::string>& tokens
 			);
 
-		void parseTileMapArrayMap
+		BlockMap readBlockMap
 			(
-			const std::vector<std::string>& tokens
+			Image& image,
+			std::map<std::size_t, Palette&>& palettes,
+			TileSet& tileSet,
+			TileMapArray& tileMapArray,
+			uint16_t x,
+			uint16_t y,
+			uint16_t mapW,
+			uint16_t mapH
 			);
 
 		Sprite readSprite
@@ -181,18 +193,6 @@ namespace GenImageTool
 			uint16_t y,
 			uint16_t tileW,
 			uint16_t tileH
-			);
-
-		TileMapArrayMap readTileMapArrayMap
-			(
-			Image& image,
-			std::map<std::size_t, Palette&>& palettes,
-			TileSet& tileSet,
-			TileMapArray& tileMapArray,
-			uint16_t x,
-			uint16_t y,
-			uint16_t mapW,
-			uint16_t mapH
 			);
 	};
 }

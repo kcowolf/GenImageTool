@@ -48,7 +48,7 @@
     <ClCompile Include="src\SpriteArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TileMapArrayMap.cpp">
+    <ClCompile Include="src\BlockMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,7 +95,7 @@
     <ClInclude Include="src\SpriteArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TileMapArrayMap.hpp">
+    <ClInclude Include="src\BlockMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,28 +14,25 @@ int main(int argc, char* argv[])
 	printf("GenImageTool - v%s\n\n", VERSION);
 
 	std::filesystem::path graphicsDir;
+	std::filesystem::path outputDir;
 	std::filesystem::path inputFile;
 
 	try
 	{
 		TCLAP::CmdLine cmdLine{ "", ' ', VERSION };
 		TCLAP::ValueArg<std::string> graphicsDirArg{ "g", "graphicsDir", "Directory where image files are located (defaults to same directory as input file)", false, "", "directory" };
+		TCLAP::ValueArg<std::string> outputDirArg{ "o", "outputDir", "Directory where files will be written (defaults to same directory as input file)", false, "", "directory" };
 		TCLAP::UnlabeledValueArg<std::string> inputFileArg{ "inputFile", "Text file to be parsed", true, "", "filename" };
 
 		cmdLine.add(graphicsDirArg);
+		cmdLine.add(outputDirArg);
 		cmdLine.add(inputFileArg);
 		cmdLine.parse(argc, argv);
 
 		inputFile = std::filesystem::absolute(inputFileArg.getValue());
 
-		if (graphicsDirArg.getValue().empty())
-		{
-			graphicsDir = inputFile.parent_path();
-		}
-		else
-		{
-			graphicsDir = graphicsDirArg.getValue();
-		}
+		graphicsDir = graphicsDirArg.getValue().empty() ? inputFile.parent_path() : graphicsDirArg.getValue();
+		outputDir = outputDirArg.getValue().empty() ? inputFile.parent_path() : outputDirArg.getValue();
 	}
 	catch (TCLAP::ArgException& e)
 	{
@@ -54,7 +51,7 @@ int main(int argc, char* argv[])
 		GenesisObjects genesisObjects = parser.parse(inputFile, graphicsDir);
 
 		GenImageTool::Writer writer;
-		writer.write(genesisObjects);
+		writer.write(genesisObjects, outputDir);
 
 		printf("Done!\n");
 	}

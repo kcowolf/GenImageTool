@@ -23,7 +23,7 @@ namespace GenImageTool
     // tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H
     // tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y
-    // tilemap_array_map TILEMAPARRAYMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H
+    // block_map BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H
 
     // sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // sprite_array SPRITEARRAY_NAME TILE_W TILE_H
@@ -33,6 +33,7 @@ namespace GenImageTool
     {
         m_lineCounter = 0;
 
+        m_commands["blockmap"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseBlockMap };
         m_commands["image"] = CommandTableEntry{ -1, "", &Parser::parseImage };
         m_commands["out_h"] = CommandTableEntry{ 3, "out_h \"filename.h\" INCLUDE_GUARD", &Parser::parseOutputHFile };
         m_commands["out_c"] = CommandTableEntry{ 2, "out_c \"filename.c\"", &Parser::parseOutputCFile };
@@ -46,7 +47,6 @@ namespace GenImageTool
         m_commands["tilemap"] = CommandTableEntry{ 9, "tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseTileMap };
         m_commands["tilemap_array"] = CommandTableEntry{ 4, "tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H", &Parser::parseTileMapArray };
         m_commands["tilemap_array_entry"] = CommandTableEntry{ 7, "tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y", &Parser::parseTileMapArrayEntry };
-        m_commands["tilemap_array_map"] = CommandTableEntry{ 10, "tilemap_array_map TILEMAPARRAYMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseTileMapArrayMap };
         m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME", &Parser::parseTileSet };
     }
 
@@ -234,6 +234,36 @@ namespace GenImageTool
         }
 
         return result;
+    }
+
+    void Parser::parseBlockMap
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        if (m_genesisObjects.blockMaps.find(tokens[1]) != m_genesisObjects.blockMaps.end())
+        {
+            throw std::runtime_error("BlockMap " + tokens[1] + " already exists.");
+        }
+
+        Image& image = getImage(tokens[2]);
+        TileSet& tileSet = getTileSet(tokens[4]);
+        TileMapArray& tileMapArray = getTileMapArray(tokens[5]);
+
+        uint16_t x = std::stoi(tokens[6]);
+        uint16_t y = std::stoi(tokens[7]);
+        uint16_t mapW = std::stoi(tokens[8]);
+        uint16_t mapH = std::stoi(tokens[9]);
+
+        std::map<std::size_t, Palette&> palettes;
+
+        if (!getPaletteCollection(tokens[3], palettes))
+        {
+            palettes.insert(std::pair<std::size_t, Palette&>(0, getPalette(tokens[3])));
+        }
+
+        BlockMap blockMap = readBlockMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH);
+        m_genesisObjects.blockMaps.insert(std::pair<std::string, BlockMap>(tokens[1], blockMap));
     }
 
     void Parser::parseImage
@@ -484,36 +514,6 @@ namespace GenImageTool
         tileMapArray.addTileMap(readTileMap(image, palettes, tileSet, x, y, tileMapArray.getTileWidth(), tileMapArray.getTileHeight()));
     }
 
-    void Parser::parseTileMapArrayMap
-        (
-        const std::vector<std::string>& tokens
-        )
-    {
-        if (m_genesisObjects.tileMapArrayMaps.find(tokens[1]) != m_genesisObjects.tileMapArrayMaps.end())
-        {
-            throw std::runtime_error("TilemapArrayMap " + tokens[1] + " already exists.");
-        }
-
-        Image& image = getImage(tokens[2]);
-        TileSet& tileSet = getTileSet(tokens[4]);
-        TileMapArray& tileMapArray = getTileMapArray(tokens[5]);
-
-        uint16_t x = std::stoi(tokens[6]);
-        uint16_t y = std::stoi(tokens[7]);
-        uint16_t mapW = std::stoi(tokens[8]);
-        uint16_t mapH = std::stoi(tokens[9]);
-
-        std::map<std::size_t, Palette&> palettes;
-
-        if (!getPaletteCollection(tokens[3], palettes))
-        {
-            palettes.insert(std::pair<std::size_t, Palette&>(0, getPalette(tokens[3])));
-        }
-
-        TileMapArrayMap tileMapArrayMap = readTileMapArrayMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH);
-        m_genesisObjects.tileMapArrayMaps.insert(std::pair<std::string, TileMapArrayMap>(tokens[1], tileMapArrayMap));
-    }
-
     void Parser::parseTileSet
         (
         const std::vector<std::string>& tokens
@@ -525,6 +525,69 @@ namespace GenImageTool
         }
 
         m_genesisObjects.tileSets[tokens[1]] = TileSet();
+    }
+
+    BlockMap Parser::readBlockMap
+        (
+        Image& image,
+        std::map<std::size_t, Palette&>& palettes,
+        TileSet& tileSet,
+        TileMapArray& tileMapArray,
+        uint16_t x,
+        uint16_t y,
+        uint16_t mapW,
+        uint16_t mapH
+        )
+    {
+        BlockMap blockMap{ mapW, mapH, tileMapArray.getTileWidth(), tileMapArray.getTileHeight() };
+
+        for (int mapJ = 0; mapJ < mapH; mapJ++)
+        {
+            for (int mapI = 0; mapI < mapW; mapI++)
+            {
+                TileMap tileMap{ tileMapArray.getTileWidth(), tileMapArray.getTileHeight() };
+
+                for (int tileJ = 0; tileJ < tileMap.getTileHeight(); tileJ++)
+                {
+                    for (int tileI = 0; tileI < tileMap.getTileWidth(); tileI++)
+                    {
+                        bool tileAdded = false;
+
+                        for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !tileAdded && it != palettes.end(); ++it)
+                        {
+                            std::string tile;
+                            image.readTile(x + (mapI * tileMap.getTileWidth() * TILE_PIXEL_WIDTH) + (tileI * TILE_PIXEL_WIDTH), y + (mapJ * tileMap.getTileHeight() * TILE_PIXEL_HEIGHT) + (tileJ * TILE_PIXEL_WIDTH), it->second, tile);
+
+                            std::size_t tileIndex;
+                            if (!tileSet.find(tile, tileIndex))
+                            {
+                                tileIndex = tileSet.addTile(tile);
+                            }
+
+                            tileIndex = tileIndex | it->first;
+
+                            tileMap.addTileIndex(tileIndex);
+                            tileAdded = true;
+                        }
+
+                        if (!tileAdded)
+                        {
+                            throw std::runtime_error("BlockMap: Failed to add tile to tilemap.");
+                        }
+                    }
+                }
+
+                std::size_t tileMapArrayIndex;
+                if (!tileMapArray.find(tileMap, tileMapArrayIndex))
+                {
+                    tileMapArrayIndex = tileMapArray.addTileMap(tileMap);
+                }
+
+                blockMap.addTileMapArrayIndex(tileMapArrayIndex);
+            }
+        }
+
+        return blockMap;
     }
 
     Sprite Parser::readSprite
@@ -617,68 +680,5 @@ namespace GenImageTool
         }
 
         return tileMap;
-    }
-
-    TileMapArrayMap Parser::readTileMapArrayMap
-        (
-        Image& image,
-        std::map<std::size_t, Palette&>& palettes,
-        TileSet& tileSet,
-        TileMapArray& tileMapArray,
-        uint16_t x,
-        uint16_t y,
-        uint16_t mapW,
-        uint16_t mapH
-        )
-    {
-        TileMapArrayMap tileMapArrayMap{ mapW, mapH };
-
-        for (int mapJ = 0; mapJ < mapH; mapJ++)
-        {
-            for (int mapI = 0; mapI < mapW; mapI++)
-            {
-                TileMap tileMap{ tileMapArray.getTileWidth(), tileMapArray.getTileHeight() };
-
-                for (int tileJ = 0; tileJ < tileMap.getTileHeight(); tileJ++)
-                {
-                    for (int tileI = 0; tileI < tileMap.getTileWidth(); tileI++)
-                    {
-                        bool tileAdded = false;
-
-                        for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !tileAdded && it != palettes.end(); ++it)
-                        {
-                            std::string tile;
-                            image.readTile(x + (mapI * tileMap.getTileWidth() * TILE_PIXEL_WIDTH) + (tileI * TILE_PIXEL_WIDTH), y + (mapJ * tileMap.getTileHeight() * TILE_PIXEL_HEIGHT) + (tileJ * TILE_PIXEL_WIDTH), it->second, tile);
-
-                            std::size_t tileIndex;
-                            if (!tileSet.find(tile, tileIndex))
-                            {
-                                tileIndex = tileSet.addTile(tile);
-                            }
-
-                            tileIndex = tileIndex | it->first;
-
-                            tileMap.addTileIndex(tileIndex);
-                            tileAdded = true;
-                        }
-
-                        if (!tileAdded)
-                        {
-                            throw std::runtime_error("TileMapArray: Failed to add tile to tilemap.");
-                        }
-                    }
-                }
-
-                std::size_t tileMapArrayIndex;
-                if (!tileMapArray.find(tileMap, tileMapArrayIndex))
-                {
-                    tileMapArrayIndex = tileMapArray.addTileMap(tileMap);
-                }
-
-                tileMapArrayMap.addTileMapArrayIndex(tileMapArrayIndex);
-            }
-        }
-
-        return tileMapArrayMap;
     }
 }

@@ -7,9 +7,12 @@ namespace GenImageTool
 {
 	void Writer::write
         (
-        const GenesisObjects& genesisObjects
+        const GenesisObjects& genesisObjects,
+        const std::filesystem::path& outputDir
         )
 	{
+        m_outputDir = outputDir;
+
         if (genesisObjects.outputHFile.empty())
         {
             throw std::runtime_error("out_h missing from input file.");
@@ -20,13 +23,13 @@ namespace GenImageTool
             throw std::runtime_error("out_c missing from input file.");
         }
 
-        std::ofstream hFile{ genesisObjects.outputHFile, std::fstream::trunc };
+        std::ofstream hFile{ m_outputDir / genesisObjects.outputHFile, std::fstream::trunc };
         if (!hFile.is_open())
         {
             throw std::runtime_error("Failed to open " + genesisObjects.outputHFile.string() + " for writing.");
         }
 
-        std::ofstream cFile{ genesisObjects.outputCFile, std::fstream::trunc };
+        std::ofstream cFile{ m_outputDir / genesisObjects.outputCFile, std::fstream::trunc };
         if (!cFile.is_open())
         {
             throw std::runtime_error("Failed to open " + genesisObjects.outputCFile.string() + " for writing.");
@@ -40,7 +43,7 @@ namespace GenImageTool
         data[SPRITE_ARRAYS_TAG] = getSpriteArrayListData(genesisObjects.spriteArrays);
         data[TILEMAPS_TAG] = getTileMapListData(genesisObjects.tileMaps);
         data[TILEMAP_ARRAYS_TAG] = getTileMapArrayListData(genesisObjects.tileMapArrays);
-        data[TILEMAP_ARRAY_MAPS_TAG] = getTileMapArrayMapListData(genesisObjects.tileMapArrayMaps);
+        data[BLOCKMAPS_TAG] = getBlockMapListData(genesisObjects.blockMaps);
         data[TILESETS_TAG] = getTileSetListData(genesisObjects.tileSets);
 
         MustacheContext<kainjow::mustache::mustache::string_type> ctx{ &data };
@@ -50,6 +53,69 @@ namespace GenImageTool
         kainjow::mustache::mustache cFileTemplate{ "{{> c_file}}" };
         cFile << cFileTemplate.render(ctx);
 	}
+
+    kainjow::mustache::data Writer::getBlockMapData
+    (
+        const std::string& name,
+        const BlockMap& blockMap
+    )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[BLOCK_COUNT_TAG] = std::to_string(blockMap.getBlockHeight() * blockMap.getBlockWidth());
+        data[BLOCK_WIDTH_TAG] = std::to_string(blockMap.getBlockWidth());
+        data[BLOCK_HEIGHT_TAG] = std::to_string(blockMap.getBlockHeight());
+        data[BLOCK_TILE_WIDTH_TAG] = std::to_string(blockMap.getBlockTileWidth());
+        data[BLOCK_TILE_HEIGHT_TAG] = std::to_string(blockMap.getBlockTileHeight());
+        data[TILE_WIDTH_TAG] = std::to_string(blockMap.getBlockWidth() * blockMap.getBlockTileWidth());
+        data[TILE_HEIGHT_TAG] = std::to_string(blockMap.getBlockHeight() * blockMap.getBlockTileHeight());
+        data[PIXEL_WIDTH_TAG] = std::to_string(blockMap.getBlockWidth() * blockMap.getBlockTileWidth() * TILE_PIXEL_WIDTH);
+        data[PIXEL_HEIGHT_TAG] = std::to_string(blockMap.getBlockHeight() * blockMap.getBlockTileHeight() * TILE_PIXEL_HEIGHT);
+
+        kainjow::mustache::list rows;
+        for (std::size_t j = 0; j < blockMap.getBlockHeight(); j++)
+        {
+            kainjow::mustache::data rowData;
+            std::stringstream row;
+
+            for (std::size_t i = 0; i < blockMap.getBlockWidth(); i++)
+            {
+                row << blockMap.getTileMapArrayIndex(i, j);
+
+                if (i != blockMap.getBlockWidth() - 1 || j != blockMap.getBlockHeight() - 1)
+                {
+                    row << ",";
+                }
+
+                if (i != blockMap.getBlockWidth() - 1)
+                {
+                    row << " ";
+                }
+            }
+
+            rowData[ROW_TAG] = row.str();
+            rows.push_back(rowData);
+        }
+
+        data[ROWS_TAG] = rows;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getBlockMapListData
+        (
+        const std::map<std::string, BlockMap>& blockMaps
+        )
+    {
+        kainjow::mustache::list blockMapsData;
+
+        for (std::map<std::string, BlockMap>::const_iterator it = blockMaps.begin(); it != blockMaps.end(); ++it)
+        {
+            blockMapsData.push_back(getBlockMapData(it->first, it->second));
+        }
+
+        return blockMapsData;
+    }
 
     kainjow::mustache::data Writer::getPaletteData
         (
@@ -251,63 +317,6 @@ namespace GenImageTool
         }
 
         return tileMapArraysData;
-    }
-
-    kainjow::mustache::data Writer::getTileMapArrayMapData
-    (
-        const std::string& name,
-        const TileMapArrayMap& tileMapArrayMap
-    )
-    {
-        kainjow::mustache::data data;
-        data[NAME_TAG] = name;
-        data[MAP_COUNT_TAG] = std::to_string(tileMapArrayMap.getMapHeight() * tileMapArrayMap.getMapWidth());
-        data[MAP_WIDTH_TAG] = std::to_string(tileMapArrayMap.getMapWidth());
-        data[MAP_HEIGHT_TAG] = std::to_string(tileMapArrayMap.getMapHeight());
-
-        kainjow::mustache::list rows;
-        for (std::size_t j = 0; j < tileMapArrayMap.getMapHeight(); j++)
-        {
-            kainjow::mustache::data rowData;
-            std::stringstream row;
-
-            for (std::size_t i = 0; i < tileMapArrayMap.getMapWidth(); i++)
-            {
-                row << tileMapArrayMap.getTileMapArrayIndex(i, j);
-
-                if (i != tileMapArrayMap.getMapWidth() - 1 || j != tileMapArrayMap.getMapHeight() - 1)
-                {
-                    row << ",";
-                }
-
-                if (i != tileMapArrayMap.getMapWidth() - 1)
-                {
-                    row << " ";
-                }
-            }
-
-            rowData[ROW_TAG] = row.str();
-            rows.push_back(rowData);
-        }
-
-        data[ROWS_TAG] = rows;
-
-        return data;
-    }
-
-    kainjow::mustache::list Writer::getTileMapArrayMapListData
-        (
-        const std::map<std::string, TileMapArrayMap>& tileMapArrayMaps
-        )
-    {
-        kainjow::mustache::list tileMapArrayMapsData;
-
-        for (std::map<std::string, TileMapArrayMap>::const_iterator it = tileMapArrayMaps.begin(); it != tileMapArrayMaps.end(); ++it)
-        {
-            tileMapArrayMapsData.push_back(getTileMapArrayMapData(it->first, it->second));
-        }
-
-        return tileMapArrayMapsData;
     }
 
     kainjow::mustache::data Writer::getTileMapData

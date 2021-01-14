@@ -11,7 +11,19 @@ namespace GenImageTool
 	public:
 		void write
 			(
-			const GenesisObjects& genesisObjects
+			const GenesisObjects& genesisObjects,
+			const std::filesystem::path& outputDir
+			);
+
+		kainjow::mustache::data getBlockMapData
+			(
+			const std::string& name,
+			const BlockMap& blockMap
+			);
+
+		kainjow::mustache::list getBlockMapListData
+			(
+			const std::map<std::string, BlockMap>& blockMaps
 			);
 
 		kainjow::mustache::data getPaletteData
@@ -58,21 +70,10 @@ namespace GenImageTool
 			const std::map<std::string, TileMapArray>& tileMapArrays
 			);
 
-		kainjow::mustache::data getTileMapArrayMapData
-			(
-			const std::string& name,
-			const TileMapArrayMap& tileMapArrayMap
-			);
-
-		kainjow::mustache::list getTileMapArrayMapListData
-			(
-			const std::map<std::string, TileMapArrayMap>& tileMapArrayMaps
-			);
-
 		kainjow::mustache::data getTileMapData
 			(
 			const std::string& name,
-			const TileMap& tileMapArrayMap
+			const TileMap& tileMap
 			);
 
 		kainjow::mustache::list getTileMapListData
@@ -90,6 +91,8 @@ namespace GenImageTool
 			(
 			const std::map<std::string, TileSet>& tileSets
 			);
+
+		std::filesystem::path m_outputDir;
 	};
 }
 

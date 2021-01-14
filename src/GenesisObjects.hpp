@@ -4,13 +4,13 @@
 #include <filesystem>
 #include <map>
 #include <string>
+#include "BlockMap.hpp"
 #include "Image.hpp"
 #include "Palette.hpp"
 #include "Sprite.hpp"
 #include "SpriteArray.hpp"
 #include "TileMap.hpp"
 #include "TileMapArray.hpp"
-#include "TileMapArrayMap.hpp"
 #include "TileSet.hpp"
 
 struct GenesisObjects
@@ -19,6 +19,7 @@ struct GenesisObjects
 	std::filesystem::path outputCFile;
 	std::filesystem::path outputHFile;
 
+	std::map<std::string, GenImageTool::BlockMap> blockMaps;
 	std::map<std::string, GenImageTool::Image> images;
 	std::map<std::string, GenImageTool::Palette> palettes;
 	std::map<std::string, std::map<std::size_t, GenImageTool::Palette&>> paletteCollections;
@@ -26,7 +27,6 @@ struct GenesisObjects
 	std::map<std::string, GenImageTool::SpriteArray> spriteArrays;
 	std::map<std::string, GenImageTool::TileMap> tileMaps;
 	std::map<std::string, GenImageTool::TileMapArray> tileMapArrays;
-	std::map<std::string, GenImageTool::TileMapArrayMap> tileMapArrayMaps;
 	std::map<std::string, GenImageTool::TileSet> tileSets;
 };
 
