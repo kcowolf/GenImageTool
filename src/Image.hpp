@@ -10,54 +10,54 @@
 
 namespace GenImageTool
 {
-	class Image
-	{
-	public:
-		Image
-			(
-			const std::filesystem::path& filename,
-			bool fixColors
-			);
+    class Image
+    {
+    public:
+        Image
+            (
+            const std::filesystem::path& filename,
+            bool fixColors
+            );
 
-		~Image();
+        ~Image();
 
-		Image
-			(
-			const Image& image
-			);
+        Image
+            (
+            const Image& image
+            );
 
-		Image& operator=
-			(
-			const Image& rhs
-			);
+        Image& operator=
+            (
+            const Image& rhs
+            );
 
-		void readColors
-			(
-			unsigned int x,
-			unsigned int y,
-			unsigned int w,
-			unsigned int h,
-			Palette& palette
-			) const;
+        void readColors
+            (
+            unsigned int x,
+            unsigned int y,
+            unsigned int w,
+            unsigned int h,
+            Palette& palette
+            ) const;
 
-		bool readTile
-			(
-			unsigned int x,
-			unsigned int y,
-			Palette& palette,
-			std::string& tile
-			) const;
+        bool readTile
+            (
+            unsigned int x,
+            unsigned int y,
+            Palette& palette,
+            std::string& tile
+            ) const;
 
-	private:
-		Color getPixel
-			(
-			unsigned int x,
-			unsigned int y
-			) const;
+    private:
+        Color getPixel
+            (
+            unsigned int x,
+            unsigned int y
+            ) const;
 
-		SDL_Surface* m_surface;
-		bool m_fixColors;
-	};
+        SDL_Surface* m_surface;
+        bool m_fixColors;
+    };
 }
 
 #endif

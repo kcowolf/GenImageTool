@@ -5,12 +5,12 @@
 
 namespace GenImageTool
 {
-	void Writer::write
+    void Writer::write
         (
         const GenesisObjects& genesisObjects,
         const std::filesystem::path& outputDir
         )
-	{
+    {
         m_outputDir = outputDir;
 
         if (genesisObjects.outputHFile.empty())
@@ -52,7 +52,7 @@ namespace GenImageTool
 
         kainjow::mustache::mustache cFileTemplate{ "{{> c_file}}" };
         cFile << cFileTemplate.render(ctx);
-	}
+    }
 
     kainjow::mustache::data Writer::getBlockMapData
     (

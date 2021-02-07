@@ -5,27 +5,27 @@
 
 namespace GenImageTool
 {
-	class Color
-	{
-	public:
-		Color
-			(
-			uint8_t r,
-			uint8_t g,
-			uint8_t b,
-			bool fix
-			);
+    class Color
+    {
+    public:
+        Color
+            (
+            uint8_t r,
+            uint8_t g,
+            uint8_t b,
+            bool fix
+            );
 
-		bool operator==
-			(
-			const Color& rhs
-			) const;
+        bool operator==
+            (
+            const Color& rhs
+            ) const;
 
-		std::string getString() const;
+        std::string getString() const;
 
-	private:
-		std::string m_genesisColor;
-	};
+    private:
+        std::string m_genesisColor;
+    };
 }
 
 #endif

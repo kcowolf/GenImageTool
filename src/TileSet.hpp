@@ -7,31 +7,31 @@
 
 namespace GenImageTool
 {
-	class TileSet
-	{
-	public:
-		std::size_t addTile
-			(
-			const std::string& tile
-			);
+    class TileSet
+    {
+    public:
+        std::size_t addTile
+            (
+            const std::string& tile
+            );
 
-		bool find
-			(
-			const std::string& tile,
-			std::size_t& index
-			) const;
+        bool find
+            (
+            const std::string& tile,
+            std::size_t& index
+            ) const;
 
-		std::size_t getSize() const;
+        std::size_t getSize() const;
 
-		std::string getTile
-			(
-			std::size_t index
-			) const;
+        std::string getTile
+            (
+            std::size_t index
+            ) const;
 
-	private:
-		std::vector<std::string> m_tiles;
-		std::map<std::string, std::size_t> m_tileTransformations;
-	};
+    private:
+        std::vector<std::string> m_tiles;
+        std::map<std::string, std::size_t> m_tileTransformations;
+    };
 }
 
 #endif

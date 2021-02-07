@@ -276,7 +276,7 @@ namespace GenImageTool
 
     void Parser::parseImage
         (
-	    const std::vector<std::string>& tokens
+        const std::vector<std::string>& tokens
         )
     {
         bool fixColors = (tokens.size() == 4 && tokens[3] == "FIX_COLORS");
