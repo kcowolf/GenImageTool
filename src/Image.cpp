@@ -107,7 +107,7 @@ namespace GenImageTool
 		return;
 	}
 
-	void Image::readTile
+	bool Image::readTile
 		(
 		unsigned int x,
 		unsigned int y,
@@ -130,7 +130,7 @@ namespace GenImageTool
 				std::size_t colorIndex;
 				if (!palette.find(color, colorIndex))
 				{
-					throw std::runtime_error("Color not found in specified palette(s).");
+					return false;
 				}
 
 				stringstream << std::hex << colorIndex;
@@ -138,7 +138,7 @@ namespace GenImageTool
 		}
 
 		tile = stringstream.str();
-		return;
+		return true;
 	}
 
 	Color Image::getPixel

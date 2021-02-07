@@ -40,7 +40,7 @@ namespace GenImageTool
 			Palette& palette
 			) const;
 
-		void readTile
+		bool readTile
 			(
 			unsigned int x,
 			unsigned int y,
