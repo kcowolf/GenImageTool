@@ -12,7 +12,8 @@ namespace GenImageTool
 			std::size_t mapWidth,
 			std::size_t mapHeight,
 			std::size_t tileWidth,
-			std::size_t tileHeight
+			std::size_t tileHeight,
+			bool useShortIndexes
 			);
 
 		void addTileMapArrayIndex
@@ -34,12 +35,15 @@ namespace GenImageTool
 			std::size_t y
 			) const;
 
+		bool getUseShortIndexes() const;
+
 	private:
 		std::size_t m_blockHeight;
 		std::size_t m_blockTileHeight;
 		std::size_t m_blockTileWidth;
 		std::size_t m_blockWidth;
 		std::vector<std::size_t> m_tileMapArrayIndexes;
+		bool m_useShortIndexes;
 	};
 }
 

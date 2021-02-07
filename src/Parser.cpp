@@ -23,7 +23,8 @@ namespace GenImageTool
     // tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H
     // tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y
-    // block_map BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H
+    // blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H
+    // blockmap_8 BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H (makes array indexes 8-bit instead of 16)
 
     // sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // sprite_array SPRITEARRAY_NAME TILE_W TILE_H
@@ -34,6 +35,7 @@ namespace GenImageTool
         m_lineCounter = 0;
 
         m_commands["blockmap"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseBlockMap };
+        m_commands["blockmap_8"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseBlockMap };
         m_commands["image"] = CommandTableEntry{ -1, "", &Parser::parseImage };
         m_commands["out_h"] = CommandTableEntry{ 3, "out_h \"filename.h\" INCLUDE_GUARD", &Parser::parseOutputHFile };
         m_commands["out_c"] = CommandTableEntry{ 2, "out_c \"filename.c\"", &Parser::parseOutputCFile };
@@ -246,6 +248,8 @@ namespace GenImageTool
             throw std::runtime_error("BlockMap " + tokens[1] + " already exists.");
         }
 
+        bool useShortIndexes = (tokens[0].find('8') != std::string::npos);
+
         Image& image = getImage(tokens[2]);
         TileSet& tileSet = getTileSet(tokens[4]);
         TileMapArray& tileMapArray = getTileMapArray(tokens[5]);
@@ -262,7 +266,7 @@ namespace GenImageTool
             palettes.insert(std::pair<std::size_t, Palette&>(0, getPalette(tokens[3])));
         }
 
-        BlockMap blockMap = readBlockMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH);
+        BlockMap blockMap = readBlockMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH, useShortIndexes);
         m_genesisObjects.blockMaps.insert(std::pair<std::string, BlockMap>(tokens[1], blockMap));
     }
 
@@ -536,10 +540,11 @@ namespace GenImageTool
         uint16_t x,
         uint16_t y,
         uint16_t mapW,
-        uint16_t mapH
+        uint16_t mapH,
+        bool useShortIndexes
         )
     {
-        BlockMap blockMap{ mapW, mapH, tileMapArray.getTileWidth(), tileMapArray.getTileHeight() };
+        BlockMap blockMap{ mapW, mapH, tileMapArray.getTileWidth(), tileMapArray.getTileHeight(), useShortIndexes };
 
         for (int mapJ = 0; mapJ < mapH; mapJ++)
         {

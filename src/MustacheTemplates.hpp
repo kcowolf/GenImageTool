@@ -18,6 +18,7 @@ constexpr const char* PIXEL_HEIGHT_TAG = "PIXEL_HEIGHT";
 constexpr const char* PIXEL_WIDTH_TAG = "PIXEL_WIDTH";
 constexpr const char* ROW_TAG = "ROW";
 constexpr const char* ROWS_TAG = "ROWS";
+constexpr const char* SHORT_INDEXES_TAG = "SHORT_INDEXES";
 constexpr const char* SPRITE_ARRAYS_TAG = "SPRITEARRAYS";
 constexpr const char* SPRITE_COUNT_TAG = "SPRITE_COUNT";
 constexpr const char* SPRITES_TAG = "SPRITES";
@@ -32,7 +33,7 @@ constexpr const char* TILESETS_TAG = "TILESETS";
 
 constexpr const char* C_BLOCKMAP_TEMPLATE = R"(
 
-const uint16_t {{NAME}}[{{NAME}}_BLOCK_COUNT] =
+const uint{{#SHORT_INDEXES}}8{{/SHORT_INDEXES}}{{^SHORT_INDEXES}}16{{/SHORT_INDEXES}}_t {{NAME}}[{{NAME}}_BLOCK_COUNT] =
 {
 {{#ROWS}}
 {{> indent}}{{ROW}}
@@ -145,7 +146,7 @@ constexpr const char* H_BLOCKMAP_TEMPLATE = R"(
 #define {{NAME}}_TILE_HEIGHT {{TILE_HEIGHT}}
 #define {{NAME}}_PIXEL_WIDTH {{PIXEL_WIDTH}}
 #define {{NAME}}_PIXEL_HEIGHT {{PIXEL_HEIGHT}}
-extern const uint16_t {{NAME}}[{{NAME}}_BLOCK_COUNT];
+extern const uint{{#SHORT_INDEXES}}8{{/SHORT_INDEXES}}{{^SHORT_INDEXES}}16{{/SHORT_INDEXES}}_t {{NAME}}[{{NAME}}_BLOCK_COUNT];
 )";
 
 

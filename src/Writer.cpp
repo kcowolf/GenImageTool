@@ -71,6 +71,7 @@ namespace GenImageTool
         data[TILE_HEIGHT_TAG] = std::to_string(blockMap.getBlockHeight() * blockMap.getBlockTileHeight());
         data[PIXEL_WIDTH_TAG] = std::to_string(blockMap.getBlockWidth() * blockMap.getBlockTileWidth() * TILE_PIXEL_WIDTH);
         data[PIXEL_HEIGHT_TAG] = std::to_string(blockMap.getBlockHeight() * blockMap.getBlockTileHeight() * TILE_PIXEL_HEIGHT);
+        data[SHORT_INDEXES_TAG] = blockMap.getUseShortIndexes();
 
         kainjow::mustache::list rows;
         for (std::size_t j = 0; j < blockMap.getBlockHeight(); j++)

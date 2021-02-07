@@ -8,12 +8,14 @@ namespace GenImageTool
 		std::size_t blockWidth,
 		std::size_t blockHeight,
 		std::size_t blockTileWidth,
-		std::size_t blockTileHeight
+		std::size_t blockTileHeight,
+		bool useShortIndexes
 		)
 		: m_blockHeight(blockHeight)
 		, m_blockTileHeight(blockTileHeight)
 		, m_blockTileWidth(blockTileWidth)
 		, m_blockWidth(blockWidth)
+		, m_useShortIndexes(useShortIndexes)
 	{
 		m_tileMapArrayIndexes.reserve(m_blockWidth * m_blockHeight);
 	}
@@ -26,6 +28,11 @@ namespace GenImageTool
 		if (m_tileMapArrayIndexes.size() >= m_blockWidth * m_blockHeight)
 		{
 			throw std::runtime_error("BlockMap has too many indexes.");
+		}
+
+		if (m_useShortIndexes && m_tileMapArrayIndexes.size() >= 255)
+		{
+			throw std::runtime_error("BlockMap has too many indexes for uint8_t.");
 		}
 
 		m_tileMapArrayIndexes.push_back(tileMapArrayIndex);
@@ -73,5 +80,10 @@ namespace GenImageTool
 		}
 
 		return m_tileMapArrayIndexes[(static_cast<std::size_t>(y) * m_blockWidth) + x];
+	}
+
+	bool BlockMap::getUseShortIndexes() const
+	{
+		return m_useShortIndexes;
 	}
 }

@@ -170,7 +170,8 @@ namespace GenImageTool
 			uint16_t x,
 			uint16_t y,
 			uint16_t mapW,
-			uint16_t mapH
+			uint16_t mapH,
+			bool useShortIndexes
 			);
 
 		Sprite readSprite

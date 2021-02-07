@@ -58,7 +58,13 @@ const uint16_t GFX_TILEMAPARRAY_1[GFX_TILEMAPARRAY_1_TILEMAP_COUNT][GFX_TILEMAPA
     }
 };
 
-const uint16_t GFX_BLOCKMAP_1[GFX_BLOCKMAP_1_MAP_COUNT] =
+const uint16_t GFX_BLOCKMAP_1[GFX_BLOCKMAP_1_BLOCK_COUNT] =
+{
+    0, 1, 0, 1,
+    1, 0, 1, 0
+};
+
+const uint8_t GFX_BLOCKMAP_2[GFX_BLOCKMAP_2_BLOCK_COUNT] =
 {
     0, 1, 0, 1,
     1, 0, 1, 0
