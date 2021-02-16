@@ -438,7 +438,6 @@ namespace GenImageTool
     {
         SpriteArray& spriteArray = getSpriteArray(tokens[1]);
         Image& image = getImage(tokens[2]);
-        Palette& palette = getPalette(tokens[3]);
         TileSet& tileSet = getTileSet(tokens[4]);
 
         uint16_t x = std::stoi(tokens[5]);
@@ -506,7 +505,6 @@ namespace GenImageTool
     {
         TileMapArray& tileMapArray = getTileMapArray(tokens[1]);
         Image& image = getImage(tokens[2]);
-        Palette& palette = getPalette(tokens[3]);
         TileSet& tileSet = getTileSet(tokens[4]);
 
         uint16_t x = std::stoi(tokens[5]);
