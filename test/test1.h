@@ -7,7 +7,7 @@
 
 extern const uint16_t GFX_PAL_1[16];
 
-#define GFX_TILESET_1_TILE_COUNT 4
+#define GFX_TILESET_1_TILE_COUNT 8
 extern const uint32_t GFX_TILESET_1[GFX_TILESET_1_TILE_COUNT][8];
 
 #define GFX_TILESET_2_TILE_COUNT 4
@@ -25,6 +25,6 @@ extern const uint16_t GFX_TILEMAP_1[GFX_TILEMAP_1_TILE_COUNT];
 #define GFX_SPRITE_1_PIXEL_WIDTH 16
 #define GFX_SPRITE_1_PIXEL_HEIGHT 16
 #define GFX_SPRITE_1_TILE_COUNT 4
-extern const uint16_t GFX_SPRITE_1[GFX_SPRITE_1_TILE_COUNT];
+#define GFX_SPRITE_1_TILE 4
 
 #endif

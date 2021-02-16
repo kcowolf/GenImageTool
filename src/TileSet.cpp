@@ -64,6 +64,11 @@ namespace GenImageTool
         return tileIndex;
     }
 
+    void TileSet::clear()
+    {
+        m_tiles.clear();
+    }
+
     std::size_t TileSet::getSize() const
     {
         return m_tiles.size();

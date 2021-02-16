@@ -15,6 +15,8 @@ namespace GenImageTool
             const std::string& tile
             );
 
+        void clear();
+
         bool find
             (
             const std::string& tile,

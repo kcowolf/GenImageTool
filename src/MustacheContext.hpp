@@ -29,7 +29,6 @@ namespace GenImageTool
             addPartial("c_blockmap", C_BLOCKMAP_TEMPLATE);
             addPartial("c_file", C_FILE_TEMPLATE);
             addPartial("c_palette", C_PALETTE_TEMPLATE);
-            addPartial("c_sprite", C_SPRITE_TEMPLATE);
             addPartial("c_spritearray", C_SPRITEARRAY_TEMPLATE);
             addPartial("c_tilemap", C_TILEMAP_TEMPLATE);
             addPartial("c_tilemaparray", C_TILEMAPARRAY_TEMPLATE);

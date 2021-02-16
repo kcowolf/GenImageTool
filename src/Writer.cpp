@@ -185,33 +185,7 @@ namespace GenImageTool
         data[TILE_HEIGHT_TAG] = std::to_string(sprite.getTileHeight());
         data[PIXEL_WIDTH_TAG] = std::to_string(sprite.getTileWidth() * TILE_PIXEL_WIDTH);
         data[PIXEL_HEIGHT_TAG] = std::to_string(sprite.getTileHeight() * TILE_PIXEL_HEIGHT);
-
-        kainjow::mustache::list rows;
-        for (std::size_t j = 0; j < sprite.getTileHeight(); j++)
-        {
-            kainjow::mustache::data rowData;
-            std::stringstream row;
-
-            for (std::size_t i = 0; i < sprite.getTileWidth(); i++)
-            {
-                row << sprite.getTileIndex(i, j);
-
-                if (i != sprite.getTileWidth() - 1 || j != sprite.getTileHeight() - 1)
-                {
-                    row << ",";
-                }
-
-                if (i != sprite.getTileWidth() - 1)
-                {
-                    row << " ";
-                }
-            }
-
-            rowData[ROW_TAG] = row.str();
-            rows.push_back(rowData);
-        }
-
-        data[ROWS_TAG] = rows;
+        data[SPRITE_TILE_TAG] = std::to_string(sprite.getStartTileIdx());
 
         return data;
     }

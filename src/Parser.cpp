@@ -633,40 +633,50 @@ namespace GenImageTool
         uint16_t tileH
         )
     {
-        Sprite sprite{ tileW, tileH };
+        bool added = false;
 
-        for (int i = 0; i < tileW; i++)
+        TileSet spriteTileSet;
+
+        for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
         {
-            for (int j = 0; j < tileH; j++)
-            {
-                bool added = false;
+            added = true;
+            spriteTileSet.clear();
 
-                for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
+            for (int i = 0; added && i < tileW; i++)
+            {
+                for (int j = 0; added && j < tileH; j++)
                 {
                     std::string tile;
                     if (image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), it->second, tile))
                     {
-                        std::size_t tileIndex;
-                        if (!tileSet.find(tile, tileIndex))
-                        {
-                            tileIndex = tileSet.addTile(tile);
-                        }
-
-                        tileIndex = tileIndex | it->first;
-
-                        sprite.addTileIndex(tileIndex);
-                        added = true;
+                        spriteTileSet.addTile(tile);
+                    }
+                    else
+                    {
+                        // Cannot read all tiles with this palette.
+                        added = false;
                     }
                 }
-
-                if (!added)
-                {
-                    throw std::runtime_error("Failed to add tile to sprite.");
-                }
             }
+
+            // If added == true at this point, all tiles were found in a single palette.  If false, at least one
+            // tile was not found in this palette, and we need to try the next one.
         }
 
-        return sprite;
+        if (added)
+        {
+            std::size_t startTileIdx = tileSet.getSize();
+
+            for (std::size_t i = 0; i < spriteTileSet.getSize(); i++)
+            {
+                tileSet.addTile(spriteTileSet.getTile(i));
+            }
+            return Sprite{ tileW, tileH, startTileIdx };
+        }
+        else
+        {
+            throw std::runtime_error("Failed to read sprite.");
+        }
     }
 
     TileMap Parser::readTileMap

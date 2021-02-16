@@ -145,9 +145,3 @@ const uint16_t GFX_TILEMAP_1[GFX_TILEMAP_1_TILE_COUNT] =
     0, 8192,
     16384, 24576
 };
-
-const uint16_t GFX_SPRITE_1[GFX_SPRITE_1_TILE_COUNT] =
-{
-    0, 16384,
-    8192, 24576
-};
