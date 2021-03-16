@@ -665,12 +665,18 @@ namespace GenImageTool
 
         if (added)
         {
-            std::size_t startTileIdx = tileSet.getSize();
+            std::size_t startTileIdx;
 
-            for (std::size_t i = 0; i < spriteTileSet.getSize(); i++)
+            if (!tileSet.findTileSet(spriteTileSet, startTileIdx))
             {
-                tileSet.addTile(spriteTileSet.getTile(i));
+                startTileIdx = tileSet.getSize();
+
+                for (std::size_t i = 0; i < spriteTileSet.getSize(); i++)
+                {
+                    tileSet.addTile(spriteTileSet.getTile(i));
+                }
             }
+
             return Sprite{ tileW, tileH, startTileIdx };
         }
         else

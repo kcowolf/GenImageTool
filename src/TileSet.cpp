@@ -91,6 +91,38 @@ namespace GenImageTool
         return false;
     }
 
+    bool TileSet::findTileSet
+        (
+        const TileSet& tileSet,
+        std::size_t& startIdx
+        ) const
+    {
+        bool found = false;
+
+        if (getSize() >= tileSet.getSize())
+        {
+            for (std::size_t i = 0; !found && i <= getSize() - tileSet.getSize(); i++)
+            {
+                found = true;
+
+                for (std::size_t j = 0; found && j < tileSet.getSize(); j++)
+                {
+                    if (getTile(i + j) != tileSet.getTile(j))
+                    {
+                        found = false;
+                    }
+                }
+
+                if (found)
+                {
+                    startIdx = i;
+                }
+            }
+        }
+
+        return found;
+    }
+
     std::string TileSet::getTile
         (
         std::size_t index

@@ -23,6 +23,12 @@ namespace GenImageTool
             std::size_t& index
             ) const;
 
+        bool findTileSet
+            (
+            const TileSet& tileSet,
+            std::size_t& startIdx
+            ) const;
+
         std::size_t getSize() const;
 
         std::string getTile
