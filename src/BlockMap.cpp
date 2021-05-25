@@ -30,9 +30,9 @@ namespace GenImageTool
             throw std::runtime_error("BlockMap has too many indexes.");
         }
 
-        if (m_useShortIndexes && m_tileMapArrayIndexes.size() >= 255)
+        if (m_useShortIndexes && tileMapArrayIndex > UINT8_MAX)
         {
-            throw std::runtime_error("BlockMap has too many indexes for uint8_t.");
+            throw std::runtime_error("BlockMap's TileMapArray has too many tiles for uint8_t.");
         }
 
         m_tileMapArrayIndexes.push_back(tileMapArrayIndex);
