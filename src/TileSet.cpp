@@ -87,7 +87,7 @@ namespace GenImageTool
             index = it->second;
             return true;
         }
-        
+
         return false;
     }
 
@@ -134,5 +134,21 @@ namespace GenImageTool
         }
 
         return m_tiles[index];
+    }
+
+    std::string TileSet::getTileTransformation
+        (
+        std::size_t index
+        ) const
+    {
+        for (std::map<std::string, std::size_t>::const_iterator it = m_tileTransformations.begin(); it != m_tileTransformations.end(); it++)
+        {
+            if (it->second == index)
+            {
+                return it->first;
+            }
+        }
+
+        throw new std::runtime_error("Invalid tile transformation index.");
     }
 }

@@ -45,6 +45,7 @@ namespace GenImageTool
         data[TILEMAP_ARRAYS_TAG] = getTileMapArrayListData(genesisObjects.tileMapArrays);
         data[BLOCKMAPS_TAG] = getBlockMapListData(genesisObjects.blockMaps);
         data[TILESETS_TAG] = getTileSetListData(genesisObjects.tileSets);
+        data[COLLISIONBLOCKARRAYS_TAG] = getCollisionBlockArrayListData(genesisObjects.collisionBlockArrays);
 
         MustacheContext<kainjow::mustache::mustache::string_type> ctx{ &data };
         kainjow::mustache::mustache hFileTemplate{ "{{> h_file}}" };
@@ -116,6 +117,74 @@ namespace GenImageTool
         }
 
         return blockMapsData;
+    }
+
+    kainjow::mustache::data Writer::getCollisionBlockArrayData
+        (
+        const std::string& name,
+        const CollisionBlockArray& collisionBlockArray
+        )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[BLOCK_COUNT_TAG] = std::to_string(collisionBlockArray.getBlockCount());
+
+        kainjow::mustache::list ceilingRows;
+        kainjow::mustache::list floorRows;
+        for (std::size_t j = 0; j < collisionBlockArray.getBlockCount(); j++)
+        {
+            kainjow::mustache::data ceilingRowData;
+            kainjow::mustache::data floorRowData;
+            std::stringstream ceilingRow;
+            std::stringstream floorRow;
+
+            const CollisionBlock& ceilingCollisionBlock = collisionBlockArray.getCeilingCollisionBlock(j);
+            const CollisionBlock& floorCollisionBlock = collisionBlockArray.getFloorCollisionBlock(j);
+
+            for (std::size_t i = 0; i < 16; i++)
+            {
+                ceilingRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(ceilingCollisionBlock[i]);
+                floorRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(floorCollisionBlock[i]);
+
+                if (i != 15 || j != collisionBlockArray.getBlockCount() - 1)
+                {
+                    ceilingRow << ",";
+                    floorRow << ",";
+                }
+
+                if (i != 15)
+                {
+                    ceilingRow << " ";
+                    floorRow << " ";
+                }
+            }
+
+            ceilingRowData[ROW_TAG] = ceilingRow.str();
+            ceilingRows.push_back(ceilingRowData);
+
+            floorRowData[ROW_TAG] = floorRow.str();
+            floorRows.push_back(floorRowData);
+        }
+
+        data[CEILING_ROWS_TAG] = ceilingRows;
+        data[FLOOR_ROWS_TAG] = floorRows;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getCollisionBlockArrayListData
+        (
+        const std::map<std::string, CollisionBlockArray>& collisionBlockArrays
+        )
+    {
+        kainjow::mustache::list collisionBlockArraysData;
+
+        for (std::map<std::string, CollisionBlockArray>::const_iterator it = collisionBlockArrays.begin(); it != collisionBlockArrays.end(); ++it)
+        {
+            collisionBlockArraysData.push_back(getCollisionBlockArrayData(it->first, it->second));
+        }
+
+        return collisionBlockArraysData;
     }
 
     kainjow::mustache::data Writer::getPaletteData

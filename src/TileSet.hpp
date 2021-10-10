@@ -36,6 +36,11 @@ namespace GenImageTool
             std::size_t index
             ) const;
 
+        std::string getTileTransformation
+            (
+            std::size_t index
+            ) const;
+
     private:
         std::vector<std::string> m_tiles;
         std::map<std::string, std::size_t> m_tileTransformations;

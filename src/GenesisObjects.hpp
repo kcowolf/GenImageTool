@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "BlockMap.hpp"
+#include "CollisionBlockArray.hpp"
 #include "Image.hpp"
 #include "Palette.hpp"
 #include "Sprite.hpp"
@@ -28,6 +29,8 @@ struct GenesisObjects
     std::map<std::string, GenImageTool::TileMap> tileMaps;
     std::map<std::string, GenImageTool::TileMapArray> tileMapArrays;
     std::map<std::string, GenImageTool::TileSet> tileSets;
+
+    std::map<std::string, GenImageTool::CollisionBlockArray> collisionBlockArrays;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "BlockMap.hpp"
+#include "CollisionBlockArray.hpp"
 #include "GenesisObjects.hpp"
 #include "Image.hpp"
 #include "Palette.hpp"
@@ -48,6 +49,11 @@ namespace GenImageTool
 
         GenesisObjects m_genesisObjects;
 
+        CollisionBlockArray& getCollisionBlockArray
+            (
+            const std::string& name
+            );
+
         std::string getErrorPrefix();
 
         Image& getImage
@@ -87,6 +93,16 @@ namespace GenImageTool
             );
 
         void parseBlockMap
+            (
+            const std::vector<std::string>& tokens
+            );
+
+        void parseCollisionBlockArray
+            (
+            const std::vector<std::string>& tokens
+            );
+
+        void parseCollisionBlockArrayEntry
             (
             const std::vector<std::string>& tokens
             );

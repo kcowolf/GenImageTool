@@ -54,6 +54,9 @@ namespace GenImageTool
         m_commands["tilemap_array_entry"] = CommandTableEntry{ 7, "tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y", &Parser::parseTileMapArrayEntry };
         m_commands["tiles"] = CommandTableEntry{ 8, "tiles IMAGE_NAME PALETTE(_COLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H", &Parser::parseTiles };
         m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME", &Parser::parseTileSet };
+
+        m_commands["collisionblock_array"] = CommandTableEntry{ 2, "collisionblock_array COLLISIONBLOCKARAY_NAME", &Parser::parseCollisionBlockArray };
+        m_commands["collisionblock_array_entry"] = CommandTableEntry{ 4, "collisionblock_array_entry COLLISIONBLOCKARAY_NAME TILEMAPARRAY_NAME TILESET_NAME", &Parser::parseCollisionBlockArrayEntry };
     }
 
     GenesisObjects Parser::parse
@@ -116,6 +119,21 @@ namespace GenImageTool
         }
 
         return m_genesisObjects;
+    }
+
+    CollisionBlockArray& Parser::getCollisionBlockArray
+        (
+        const std::string& name
+        )
+    {
+        std::map<std::string, CollisionBlockArray>::iterator collisionBlockArray = m_genesisObjects.collisionBlockArrays.find(name);
+
+        if (collisionBlockArray == m_genesisObjects.collisionBlockArrays.end())
+        {
+            throw std::runtime_error("CollisionBlockArray " + name + " does not exist.");
+        }
+
+        return collisionBlockArray->second;
     }
 
     std::string Parser::getErrorPrefix()
@@ -272,6 +290,72 @@ namespace GenImageTool
 
         BlockMap blockMap = readBlockMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH, useShortIndexes);
         m_genesisObjects.blockMaps.insert(std::pair<std::string, BlockMap>(tokens[1], blockMap));
+    }
+
+    void Parser::parseCollisionBlockArray
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        if (m_genesisObjects.collisionBlockArrays.find(tokens[1]) != m_genesisObjects.collisionBlockArrays.end())
+        {
+            throw std::runtime_error("CollisionBlockArray " + tokens[1] + " already exists.");
+        }
+
+        CollisionBlockArray collisionBlockArray;
+        m_genesisObjects.collisionBlockArrays.insert(std::pair<std::string, CollisionBlockArray>(tokens[1], collisionBlockArray));
+    }
+
+    void Parser::parseCollisionBlockArrayEntry
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        CollisionBlockArray& collisionBlockArray = getCollisionBlockArray(tokens[1]);
+        TileMapArray& tileMapArray = getTileMapArray(tokens[2]);
+        TileSet& tileSet = getTileSet(tokens[3]);
+
+        for (std::size_t tileMapIdx = 0; tileMapIdx < tileMapArray.getTileMapCount(); tileMapIdx++)
+        {
+            TileMap tileMap = tileMapArray.getTileMap(tileMapIdx);
+
+            CollisionBlock ceilingCollisionBlock{};
+            CollisionBlock floorCollisionBlock{};
+
+            for (std::size_t x = 0; x < 16; x++)
+            {
+                uint8_t ceilingHeight = 0;  // distance from the top of the block
+                uint8_t floorHeight = 0;  // distance from the bottom of the block
+
+                for (std::size_t y = 0; y < 16; y++)
+                {
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[((y & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
+                        {
+                            ceilingHeight = y + 1;
+                        }
+                    }
+
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(16 - y - 1));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[(((16 - y - 1) & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
+                        {
+                            floorHeight = y + 1;
+                        }
+                    }
+                }
+
+                ceilingCollisionBlock[x] = ceilingHeight;
+                floorCollisionBlock[x] = floorHeight;
+            }
+
+            collisionBlockArray.addCollisionBlock(ceilingCollisionBlock, floorCollisionBlock);
+        }
     }
 
     void Parser::parseImage
