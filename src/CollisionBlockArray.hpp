@@ -15,7 +15,9 @@ namespace GenImageTool
         std::size_t addCollisionBlock
             (
             const CollisionBlock& ceilingCollisionBlock,
-            const CollisionBlock& floorCollisionBlock
+            const CollisionBlock& floorCollisionBlock,
+            const CollisionBlock& leftCollisionBlock,
+            const CollisionBlock& rightCollisionBlock
             );
 
         std::size_t getBlockCount() const;
@@ -30,9 +32,21 @@ namespace GenImageTool
             std::size_t idx
             ) const;
 
+        const CollisionBlock& getLeftCollisionBlock
+            (
+            std::size_t idx
+            ) const;
+
+        const CollisionBlock& getRightCollisionBlock
+            (
+            std::size_t idx
+            ) const;
+
     private:
         std::vector<CollisionBlock> m_ceilingCollisionBlocks;
         std::vector<CollisionBlock> m_floorCollisionBlocks;
+        std::vector<CollisionBlock> m_leftCollisionBlocks;
+        std::vector<CollisionBlock> m_rightCollisionBlocks;
     };
 }
 

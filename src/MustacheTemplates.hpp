@@ -15,10 +15,12 @@ constexpr const char* FLOOR_ROWS_TAG = "FLOOR_ROWS";
 constexpr const char* HEADER_FILENAME_TAG = "HEADER_FILENAME";
 constexpr const char* INCLUDE_GUARD_TAG = "INCLUDE_GUARD";
 constexpr const char* ISLAST_TAG = "ISLAST";
+constexpr const char* LEFT_ROWS_TAG = "LEFT_ROWS";
 constexpr const char* NAME_TAG = "NAME";
 constexpr const char* PALETTES_TAG = "PALETTES";
 constexpr const char* PIXEL_HEIGHT_TAG = "PIXEL_HEIGHT";
 constexpr const char* PIXEL_WIDTH_TAG = "PIXEL_WIDTH";
+constexpr const char* RIGHT_ROWS_TAG = "RIGHT_ROWS";
 constexpr const char* ROW_TAG = "ROW";
 constexpr const char* ROWS_TAG = "ROWS";
 constexpr const char* SHORT_INDEXES_TAG = "SHORT_INDEXES";
@@ -61,6 +63,20 @@ const uint8_t {{NAME}}_FLOORS[{{NAME}}_BLOCK_COUNT * 16] =
 {{#FLOOR_ROWS}}
 {{> indent}}{{ROW}}
 {{/FLOOR_ROWS}}
+};
+
+const uint8_t {{NAME}}_LEFTS[{{NAME}}_BLOCK_COUNT * 16] =
+{
+{{#LEFT_ROWS}}
+{{> indent}}{{ROW}}
+{{/LEFT_ROWS}}
+};
+
+const uint8_t {{NAME}}_RIGHTS[{{NAME}}_BLOCK_COUNT * 16] =
+{
+{{#RIGHT_ROWS}}
+{{> indent}}{{ROW}}
+{{/RIGHT_ROWS}}
 };
 )";
 
@@ -163,6 +179,8 @@ constexpr const char* H_COLLISIONBLOCKARRAY_TEMPLATE = R"(
 #define {{NAME}}_BLOCK_COUNT {{BLOCK_COUNT}}
 extern const uint8_t {{NAME}}_CEILINGS[{{NAME}}_BLOCK_COUNT * 16];
 extern const uint8_t {{NAME}}_FLOORS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_LEFTS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_RIGHTS[{{NAME}}_BLOCK_COUNT * 16];
 )";
 
 

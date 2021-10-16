@@ -321,6 +321,8 @@ namespace GenImageTool
 
             CollisionBlock ceilingCollisionBlock{};
             CollisionBlock floorCollisionBlock{};
+            CollisionBlock leftCollisionBlock{};
+            CollisionBlock rightCollisionBlock{};
 
             for (std::size_t x = 0; x < 16; x++)
             {
@@ -354,7 +356,39 @@ namespace GenImageTool
                 floorCollisionBlock[x] = floorHeight;
             }
 
-            collisionBlockArray.addCollisionBlock(ceilingCollisionBlock, floorCollisionBlock);
+            for (std::size_t y = 0; y < 16; y++)
+            {
+                uint8_t leftHeight = 0;  // distance from the left edge of the block
+                uint8_t rightHeight = 0;  // distance from the right edge of the block
+
+                for (std::size_t x = 0; x < 16; x++)
+                {
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[((y & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
+                        {
+                            leftHeight = x + 1;
+                        }
+                    }
+
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(16 - x - 1), PIXEL_TO_TILE(y));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[(((y & 7) * TILE_PIXEL_WIDTH) + ((16 - x - 1) & 7))] != '0')
+                        {
+                            rightHeight = x + 1;
+                        }
+                    }
+                }
+
+                leftCollisionBlock[y] = leftHeight;
+                rightCollisionBlock[y] = rightHeight;
+            }
+
+            collisionBlockArray.addCollisionBlock(ceilingCollisionBlock, floorCollisionBlock, leftCollisionBlock, rightCollisionBlock);
         }
     }
 

@@ -56,10 +56,10 @@ namespace GenImageTool
     }
 
     kainjow::mustache::data Writer::getBlockMapData
-    (
+        (
         const std::string& name,
         const BlockMap& blockMap
-    )
+        )
     {
         kainjow::mustache::data data;
         data[NAME_TAG] = name;
@@ -131,31 +131,46 @@ namespace GenImageTool
 
         kainjow::mustache::list ceilingRows;
         kainjow::mustache::list floorRows;
+        kainjow::mustache::list leftRows;
+        kainjow::mustache::list rightRows;
+
         for (std::size_t j = 0; j < collisionBlockArray.getBlockCount(); j++)
         {
             kainjow::mustache::data ceilingRowData;
             kainjow::mustache::data floorRowData;
+            kainjow::mustache::data leftRowData;
+            kainjow::mustache::data rightRowData;
             std::stringstream ceilingRow;
             std::stringstream floorRow;
+            std::stringstream leftRow;
+            std::stringstream rightRow;
 
             const CollisionBlock& ceilingCollisionBlock = collisionBlockArray.getCeilingCollisionBlock(j);
             const CollisionBlock& floorCollisionBlock = collisionBlockArray.getFloorCollisionBlock(j);
+            const CollisionBlock& leftCollisionBlock = collisionBlockArray.getLeftCollisionBlock(j);
+            const CollisionBlock& rightCollisionBlock = collisionBlockArray.getRightCollisionBlock(j);
 
             for (std::size_t i = 0; i < 16; i++)
             {
                 ceilingRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(ceilingCollisionBlock[i]);
                 floorRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(floorCollisionBlock[i]);
+                leftRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(leftCollisionBlock[i]);
+                rightRow << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(rightCollisionBlock[i]);
 
                 if (i != 15 || j != collisionBlockArray.getBlockCount() - 1)
                 {
                     ceilingRow << ",";
                     floorRow << ",";
+                    leftRow << ",";
+                    rightRow << ",";
                 }
 
                 if (i != 15)
                 {
                     ceilingRow << " ";
                     floorRow << " ";
+                    leftRow << " ";
+                    rightRow << " ";
                 }
             }
 
@@ -164,10 +179,18 @@ namespace GenImageTool
 
             floorRowData[ROW_TAG] = floorRow.str();
             floorRows.push_back(floorRowData);
+
+            leftRowData[ROW_TAG] = leftRow.str();
+            leftRows.push_back(leftRowData);
+
+            rightRowData[ROW_TAG] = rightRow.str();
+            rightRows.push_back(rightRowData);
         }
 
         data[CEILING_ROWS_TAG] = ceilingRows;
         data[FLOOR_ROWS_TAG] = floorRows;
+        data[LEFT_ROWS_TAG] = leftRows;
+        data[RIGHT_ROWS_TAG] = rightRows;
 
         return data;
     }
