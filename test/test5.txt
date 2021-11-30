@@ -1,5 +1,5 @@
 # out_h "filename.h" INCLUDE_GUARD
-out_h "test5.h" TEST4_H
+out_h "test5.h" TEST5_H
 
 # out_c "filename.c"
 out_c "test5.c"

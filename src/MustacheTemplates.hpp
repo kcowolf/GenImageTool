@@ -51,28 +51,28 @@ const uint{{#SHORT_INDEXES}}8{{/SHORT_INDEXES}}{{^SHORT_INDEXES}}16{{/SHORT_INDE
 
 constexpr const char* C_COLLISIONBLOCKARRAY_TEMPLATE = R"(
 
-const uint8_t {{NAME}}_CEILINGS[{{NAME}}_BLOCK_COUNT * 16] =
+const uint8_t {{NAME}}_CEILING_DEPTHS[{{NAME}}_BLOCK_COUNT * 16] =
 {
 {{#CEILING_ROWS}}
 {{> indent}}{{ROW}}
 {{/CEILING_ROWS}}
 };
 
-const uint8_t {{NAME}}_FLOORS[{{NAME}}_BLOCK_COUNT * 16] =
+const uint8_t {{NAME}}_FLOOR_DEPTHS[{{NAME}}_BLOCK_COUNT * 16] =
 {
 {{#FLOOR_ROWS}}
 {{> indent}}{{ROW}}
 {{/FLOOR_ROWS}}
 };
 
-const uint8_t {{NAME}}_LEFTS[{{NAME}}_BLOCK_COUNT * 16] =
+const uint8_t {{NAME}}_LEFTWALL_DEPTHS[{{NAME}}_BLOCK_COUNT * 16] =
 {
 {{#LEFT_ROWS}}
 {{> indent}}{{ROW}}
 {{/LEFT_ROWS}}
 };
 
-const uint8_t {{NAME}}_RIGHTS[{{NAME}}_BLOCK_COUNT * 16] =
+const uint8_t {{NAME}}_RIGHTWALL_DEPTHS[{{NAME}}_BLOCK_COUNT * 16] =
 {
 {{#RIGHT_ROWS}}
 {{> indent}}{{ROW}}
@@ -177,10 +177,10 @@ extern const uint{{#SHORT_INDEXES}}8{{/SHORT_INDEXES}}{{^SHORT_INDEXES}}16{{/SHO
 constexpr const char* H_COLLISIONBLOCKARRAY_TEMPLATE = R"(
 
 #define {{NAME}}_BLOCK_COUNT {{BLOCK_COUNT}}
-extern const uint8_t {{NAME}}_CEILINGS[{{NAME}}_BLOCK_COUNT * 16];
-extern const uint8_t {{NAME}}_FLOORS[{{NAME}}_BLOCK_COUNT * 16];
-extern const uint8_t {{NAME}}_LEFTS[{{NAME}}_BLOCK_COUNT * 16];
-extern const uint8_t {{NAME}}_RIGHTS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_CEILING_DEPTHS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_FLOOR_DEPTHS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_LEFTWALL_DEPTHS[{{NAME}}_BLOCK_COUNT * 16];
+extern const uint8_t {{NAME}}_RIGHTWALL_DEPTHS[{{NAME}}_BLOCK_COUNT * 16];
 )";
 
 

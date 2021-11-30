@@ -4,6 +4,9 @@
 #include "Genesis.hpp"
 #include "Parser.hpp"
 
+#define EXIT_COLLISION_BLOCKS_START 16
+#define EXIT_COLLISION_BLOCKS_COUNT 16
+
 namespace GenImageTool
 {
     const char Parser::COMMENT_CHAR = '#';
@@ -324,68 +327,84 @@ namespace GenImageTool
             CollisionBlock leftCollisionBlock{};
             CollisionBlock rightCollisionBlock{};
 
-            for (std::size_t x = 0; x < 16; x++)
+            if (tileMapIdx >= EXIT_COLLISION_BLOCKS_START && tileMapIdx < EXIT_COLLISION_BLOCKS_START + EXIT_COLLISION_BLOCKS_COUNT)
             {
-                uint8_t ceilingHeight = 0;  // distance from the top of the block
-                uint8_t floorHeight = 0;  // distance from the bottom of the block
+                ceilingCollisionBlock = collisionBlockArray.getCeilingCollisionBlock(0);
+                floorCollisionBlock = collisionBlockArray.getFloorCollisionBlock(0);
+                leftCollisionBlock = collisionBlockArray.getLeftCollisionBlock(0);
+                rightCollisionBlock = collisionBlockArray.getRightCollisionBlock(0);
+            }
+            else
+            {
+                for (std::size_t x = 0; x < 16; x++)
+                {
+                    uint8_t ceilingHeight = 16;  // how many pixels of space do we have at the bottom of the block
+                    uint8_t floorDepth = 16;  // how many pixels of space do we have at the top of the block
+
+                    for (std::size_t y = 16; y > 0; y--)
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y - 1));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[(((y - 1) & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
+                        {
+                            // Found the ceiling, break out of the loop.
+                            ceilingHeight = 16 - y;
+                            break;
+                        }
+                    }
+
+                    for (std::size_t y = 0; y < 16; y++)
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[((y & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
+                        {
+                            // Found the floor, break out of the loop.
+                            floorDepth = y;
+                            break;
+                        }
+                    }
+
+                    ceilingCollisionBlock[x] = ceilingHeight;
+                    floorCollisionBlock[x] = floorDepth;
+                }
 
                 for (std::size_t y = 0; y < 16; y++)
                 {
+                    uint8_t leftWallDepth = 16;  // how many pixels of space do we have at the right of the block
+                    uint8_t rightWallDepth = 16;  // how many pixels of space do we have at the left of the block
+
+                    for (std::size_t x = 16; x > 0; x--)
+                    {
+                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x - 1), PIXEL_TO_TILE(y));
+                        std::string tile = tileSet.getTileTransformation(tileIndex);
+
+                        if (tile[((y & 7) * TILE_PIXEL_WIDTH) + ((x - 1) & 7)] != '0')
+                        {
+                            // Found the left wall, break out of the loop.
+                            leftWallDepth = 16 - x;
+                            break;
+                        }
+                    }
+
+                    for (std::size_t x = 0; x < 16; x++)
                     {
                         std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y));
                         std::string tile = tileSet.getTileTransformation(tileIndex);
 
                         if (tile[((y & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
                         {
-                            ceilingHeight = y + 1;
+                            // Found the floor, break out of the loop.
+                            rightWallDepth = x;
+                            break;
                         }
                     }
 
-                    {
-                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(16 - y - 1));
-                        std::string tile = tileSet.getTileTransformation(tileIndex);
-
-                        if (tile[(((16 - y - 1) & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
-                        {
-                            floorHeight = y + 1;
-                        }
-                    }
+                    leftCollisionBlock[y] = leftWallDepth;
+                    rightCollisionBlock[y] = rightWallDepth;
                 }
-
-                ceilingCollisionBlock[x] = ceilingHeight;
-                floorCollisionBlock[x] = floorHeight;
-            }
-
-            for (std::size_t y = 0; y < 16; y++)
-            {
-                uint8_t leftHeight = 0;  // distance from the left edge of the block
-                uint8_t rightHeight = 0;  // distance from the right edge of the block
-
-                for (std::size_t x = 0; x < 16; x++)
-                {
-                    {
-                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(x), PIXEL_TO_TILE(y));
-                        std::string tile = tileSet.getTileTransformation(tileIndex);
-
-                        if (tile[((y & 7) * TILE_PIXEL_WIDTH) + (x & 7)] != '0')
-                        {
-                            leftHeight = x + 1;
-                        }
-                    }
-
-                    {
-                        std::size_t tileIndex = tileMap.getTileIndex(PIXEL_TO_TILE(16 - x - 1), PIXEL_TO_TILE(y));
-                        std::string tile = tileSet.getTileTransformation(tileIndex);
-
-                        if (tile[(((y & 7) * TILE_PIXEL_WIDTH) + ((16 - x - 1) & 7))] != '0')
-                        {
-                            rightHeight = x + 1;
-                        }
-                    }
-                }
-
-                leftCollisionBlock[y] = leftHeight;
-                rightCollisionBlock[y] = rightHeight;
             }
 
             collisionBlockArray.addCollisionBlock(ceilingCollisionBlock, floorCollisionBlock, leftCollisionBlock, rightCollisionBlock);

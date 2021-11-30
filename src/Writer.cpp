@@ -82,7 +82,14 @@ namespace GenImageTool
 
             for (std::size_t i = 0; i < blockMap.getBlockWidth(); i++)
             {
-                row << blockMap.getTileMapArrayIndex(i, j);
+                if (blockMap.getUseShortIndexes())
+                {
+                    row << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << blockMap.getTileMapArrayIndex(i, j);
+                }
+                else
+                {
+                    row << blockMap.getTileMapArrayIndex(i, j);
+                }
 
                 if (i != blockMap.getBlockWidth() - 1 || j != blockMap.getBlockHeight() - 1)
                 {
