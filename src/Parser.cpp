@@ -23,15 +23,15 @@ namespace GenImageTool
     // tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H
     // tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y
-    // blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H
-    // blockmap_8 BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y MAP_W MAP_H (makes array indexes 8-bit instead of 16)
+    // blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H
+    // blockmap_8 BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H (makes array indexes 8-bit instead of 16)
 
     // sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H
     // sprite_array SPRITEARRAY_NAME TILE_W TILE_H
     // sprite_array_entry SPRITEARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y
 
     // Add tiles to tileset without deduplication
-    // tiles IMAGE_NAME PALETTE(_COLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H
+    // tiles IMAGE_NAME PALETTE(_COLLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H
 
     Parser::Parser()
     {
@@ -204,7 +204,7 @@ namespace GenImageTool
 
         return tileMapArray->second;
     }
-    
+
     TileSet& Parser::getTileSet
         (
         const std::string& name
@@ -752,7 +752,7 @@ namespace GenImageTool
                 for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
                 {
                     std::string tile;
-                    
+
                     if (image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), it->second, tile))
                     {
                         tileSet.addTile(tile);

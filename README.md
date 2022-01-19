@@ -20,9 +20,9 @@ The following terminology is used throughout the program:
 
 **tileset** - Collection of tiles.
 
-**block** - A small tilemap used as part of a blockmap.  For example, an image containing repeated 16x16-pixel patterns could be processed into a blockmap with blocks 2 tiles wide x 2 tiles high.
+**block** - A small tilemap used as part of a blockmap.
 
-**blockmap** - Map made up of block indexes.  A tilemap_array is used to store blocks.  Indexes may be 16 bits (blockmap) or 8 bits (blockmap_8) each.
+**blockmap** - Map made up of "blocks" (small tilemaps).  A tilemap_array is used to store blocks.  Indexes may be 16 bits (blockmap) or 8 bits (blockmap_8) each.
 
 **sprite** - Genesis hardware sprite, typically used for animated graphics or graphics which must be positioned at a specific pixel coordinate.
 
@@ -121,3 +121,74 @@ This might cause the following tile indexes to be written:
     16385, # palette 2, tile 1 (0b100000000000001)
     24576  # palette 3, tile 0 (0b110000000000000)
 ```
+
+Tilesets
+--------
+Tilesets are an array of tiles.  They are used by other objects for storing tiles.  Multiple objects can share tiles within a tileset, even if they are different types (e.g. tilemaps and sprites can be made of the same tiles).
+
+**tileset TILESET_NAME**  
+Create a tileset.
+
+```
+tileset TILESET_FOREST
+```
+
+Tiles
+-----
+Tiles can be added manually to a tileset without being de-duplicated.  This is helpful in cases when de-duplicating tiles is not desirable, such as a font.
+
+**tiles IMAGE_NAME PALETTE(_COLLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H**
+Add tiles to the tileset manually without deduplicating them.  X and Y are the location in the source image where the tiles begin.
+
+```
+# Read 128 tiles for the font.
+tiles IMG_FONT PAL_FONT TILESET_FONT 0 0 32 4
+```
+
+Tilemaps
+--------
+A tilemap breaks down a large image into 8x8-pixel tiles.  Tiles are stored in a tileset.  If the same tile is used multiple times in the tilemap, it will only be added to the tileset the first time, reducing the amount of ROM needed for storing tile data.
+
+**tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H**  
+Create a tilemap.  X and Y are the location in the source image where the tilemap begins.  TILE_W and TILE_H specify the size of the tilemap in tiles (size in pixels / 8).
+
+**tilemap_array TILEMAPARRAY_NAME TILE_W TILE_H**  
+Create a tilemap array.  Tilemap arrays are used together with blockmaps (see below).  All tilemaps in the array must be the same width and height.
+
+**tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y**  
+Add a tilemap to a tilemap array.  X and Y are the location in the source image where the tilemap begins.
+
+```
+# Create a tilemap for storing a background.
+tilemap TILEMAP_FOREST_BG IMG_FOREST PAL_FOREST_BG TILESET_FOREST_BG 0 0 32 32
+
+# Create a tilemap array and read three maps from the same image into it.  Each map is 320x224 pixels (40x28 tiles).
+tilemap_array TILEMAP_LEVELS 40 28
+tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 0 0
+tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 320 0
+tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 640 0
+```
+
+Blockmaps
+---------
+A blockmap is similar to a tilemap.  A tilemap breaks an image into tiles, while a blockmap breaks it into "blocks" (small tilemaps).  Blocks are stored in a tilemap array.  If the same block is used multiple times in the blockmap, it is only added to the array the first time.
+
+Blockmaps are useful when a map is based around a grid larger than 8x8 pixels.  For example, if a map is based on a 16x16-pixel grid, a blockmap with blocks of size 2x2 tiles could be used.
+
+If fewer than 256 unique blocks are needed, a blockmap_8 can be used, which uses 8-bit indexes instead of 16-bit.  This reduces the ROM space needed to store the map by half.
+
+**blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H**  
+Create a blockmap.  Block indexes will be of type uint16_t (2 bytes).  X and Y are the location in the source image where the blockmap begins.  BLOCK_W and BLOCK_H are "number of blocks" wide and "number of blocks" high.  A 640x480-pixel map made up of 16x16-pixel blocks would be 40x30 blocks.
+
+**blockmap_8 BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H**  
+Same as above, except block indexes will be of type uint8_t (1 byte).  This reduces the ROM size needed to store the map, but also limits the number of unique blocks to 256.
+
+```
+# Create a tilemap_array for storing blocks.
+tilemap_array TILEMAPARRAY_FOREST_FG
+
+# Create blockmaps.
+blockmap BLOCKMAP_FOREST_FG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_FG TILEMAPARRAY_FOREST_FG 0 0 40 30
+blockmap_8 BLOCKMAP_FOREST_BG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_BG TILEMAPARRAY_FOREST_BG 640 0 20 15
+```
+
