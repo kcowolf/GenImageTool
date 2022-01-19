@@ -192,3 +192,31 @@ blockmap BLOCKMAP_FOREST_FG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_FG TILEM
 blockmap_8 BLOCKMAP_FOREST_BG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_BG TILEMAPARRAY_FOREST_BG 640 0 20 15
 ```
 
+Sprites
+-------
+Like tilemaps, sprites are made of tiles.  Unlike tilemaps, however, there is no "map" associated with a sprite.  Instead, when creating a sprite, you specify the sprite's tile width and height and the location of the first tile in VRAM; the Genesis then reads (tile width * tile height) tiles
+beginning with the one you specified.  It expects the tiles to be ordered in VRAM from top to bottom and left to right.
+
+For sprites, GenImageTool breaks an image into tiles and adds them to a tileset in the expected order.  It will attempt to deduplicate tiles, but can only do so if all tiles are already present in the tileset in the required order.
+
+If tilemaps and sprites need to share tiles, it is recommended to specify sprites first in the input file.  If tilemaps are specified first, the tiles will be duplicated for sprites instead of being shared.
+
+**sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H**  
+Create a sprite.  X and Y are the location in the source image where the sprite begins.  TILE_W and TILE_H specify the size of the sprite in tiles (size in pixels / 8).  Valid TILE_W and TILE_H values are 1-4.
+
+**sprite_array SPRITEARRAY_NAME TILE_W TILE_H**  
+Create a sprite array.  All sprites in the array must be the same width and height.
+
+**sprite_array_entry SPRITEARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y**  
+Add a sprite to a sprite array.  X and Y are the location in the source image where the sprite begins.
+
+```
+# Create a player sprite, 16x16 pixels.
+sprite SPRITE_PLAYER_1 IMG_PLAYER PAL_PLAYER TILESET_PLAYER 0 0 2 2
+
+# Create a sprite array for holding multiple player sprites.  Each is 32x32 pixels (4x4 tiles).
+sprite_array SPRITEARRAY_PLAYER_RUN_RIGHT 4 4
+sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PLAYER 0 0
+sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PLAYER 32 0
+sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PLAYER 64 0
+```
