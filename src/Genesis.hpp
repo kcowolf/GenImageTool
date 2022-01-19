@@ -19,4 +19,7 @@ constexpr std::size_t TILE_PAL1 = (1 << TILE_PAL_BITSHIFT);
 constexpr std::size_t TILE_PAL2 = (2 << TILE_PAL_BITSHIFT);
 constexpr std::size_t TILE_PAL3 = (3 << TILE_PAL_BITSHIFT);
 
+constexpr std::size_t SPRITE_MIN_DIMENSION = 1;
+constexpr std::size_t SPRITE_MAX_DIMENSION = 4;
+
 #endif
