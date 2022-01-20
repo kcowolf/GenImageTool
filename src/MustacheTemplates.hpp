@@ -72,7 +72,7 @@ const uint16_t {{NAME}}[{{NAME}}_SPRITE_COUNT] =
 {{> indent}}{{SPRITE_TILE}}{{^ISLAST}},{{/ISLAST}}
 {{/SPRITES}}
 };
-)"; 
+)";
 
 
 
@@ -177,7 +177,7 @@ constexpr const char* H_SPRITEARRAY_TEMPLATE = R"(
 #define {{NAME}}_TILE_COUNT {{TILE_COUNT}}
 #define {{NAME}}_SPRITE_COUNT {{SPRITE_COUNT}}
 extern const uint16_t {{NAME}}[{{NAME}}_SPRITE_COUNT];
-)"; 
+)";
 
 
 
@@ -210,7 +210,7 @@ constexpr const char* H_TILESET_TEMPLATE = R"(
 
 #define {{NAME}}_TILE_COUNT {{TILE_COUNT}}
 extern const uint32_t {{NAME}}[{{NAME}}_TILE_COUNT][8];
-)"; 
+)";
 
 
 

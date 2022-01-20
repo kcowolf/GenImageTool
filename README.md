@@ -49,7 +49,7 @@ Everything following a pound-sign (**#**) is considered a comment.
 ```
 # This is a full-line comment.
 
-palette PAL_FOREST_BG  # Forest map background palette.
+palette PAL_FOREST  # Forest map palette.
 ```
 
 Output Filenames
@@ -77,7 +77,7 @@ Same as above, but allows invalid color values to be rounded to the nearest vali
 
 ```
 image IMG_FONT "font.png"
-image IMG_FOREST_MAP "forest.png" FIX_COLORS
+image IMG_FOREST "forest.png" FIX_COLORS
 ```
 
 Color Palettes
@@ -94,9 +94,9 @@ Manually add a color to the color palette.  Valid values for RED, GREEN, and BLU
 Automatically read colors from the image; colors will be added to the palette if they are not already present.  X, Y, WIDTH, and HEIGHT are pixel values.
 
 ```
-palette PAL_FOREST_BG
-palette_color PAL_FOREST_BG 224 0 224
-palette_colors PAL_FOREST_BG IMG_FOREST_MAP 0 0 320 224
+palette PAL_FOREST
+palette_color PAL_FOREST 224 0 224
+palette_colors PAL_FOREST IMG_FOREST 0 0 320 224
 ```
 
 Palette Collections
@@ -113,6 +113,8 @@ Palette collections are also useful if a tilemap/sprite uses multiple palettes, 
 Create a palette collection.  ? can be used as a placeholder.
 
 ```
+palette PAL_FOREST_FG
+palette PAL_FOREST_BG
 palette_collection PAL_FOREST_COLLECTION ? ? PAL_FOREST_BG PAL_FOREST_FG
 ```
 
@@ -160,13 +162,13 @@ Add a tilemap to a tilemap array.  X and Y are the location in the source image 
 
 ```
 # Create a tilemap for storing a background.
-tilemap TILEMAP_FOREST_BG IMG_FOREST PAL_FOREST_BG TILESET_FOREST_BG 0 0 32 32
+tilemap TILEMAP_FOREST IMG_FOREST PAL_FOREST TILESET_FOREST 0 0 32 32
 
 # Create a tilemap array and read three maps from the same image into it.  Each map is 320x224 pixels (40x28 tiles).
-tilemap_array TILEMAP_LEVELS 40 28
-tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 0 0
-tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 320 0
-tilemap_array_entry TILEMAP_LEVELS IMG_LEVELS PAL_LEVEL_FG TILESET_LEVELS 640 0
+tilemap_array TILEMAPARRAY_LEVELS 40 28
+tilemap_array_entry TILEMAPARRAY_LEVELS IMG_LEVELS PAL_LEVEL TILESET_LEVELS 0 0
+tilemap_array_entry TILEMAPARRAY_LEVELS IMG_LEVELS PAL_LEVEL TILESET_LEVELS 320 0
+tilemap_array_entry TILEMAPARRAY_LEVELS IMG_LEVELS PAL_LEVEL TILESET_LEVELS 640 0
 ```
 
 Blockmaps
@@ -185,11 +187,11 @@ Same as above, except block indexes will be of type uint8_t (1 byte).  This redu
 
 ```
 # Create a tilemap_array for storing blocks.
-tilemap_array TILEMAPARRAY_FOREST_FG
+tilemap_array TILEMAPARRAY_FOREST 2 2
 
 # Create blockmaps.
-blockmap BLOCKMAP_FOREST_FG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_FG TILEMAPARRAY_FOREST_FG 0 0 40 30
-blockmap_8 BLOCKMAP_FOREST_BG IMG_FOREST_MAP PAL_FOREST_FG TILESET_FOREST_BG TILEMAPARRAY_FOREST_BG 640 0 20 15
+blockmap BLOCKMAP_FOREST_FG IMG_FOREST PAL_FOREST TILESET_FOREST TILEMAPARRAY_FOREST 0 0 40 30
+blockmap_8 BLOCKMAP_FOREST_BG IMG_FOREST PAL_FOREST TILESET_FOREST TILEMAPARRAY_FOREST 640 0 20 15
 ```
 
 Sprites
@@ -220,3 +222,73 @@ sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PL
 sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PLAYER 32 0
 sprite_array_entry SPRITEARRAY_PLAYER_RUN_RIGHT IMG_PLAYER PAL_PLAYER TILESET_PLAYER 64 0
 ```
+
+Output Files
+============
+Output files are .h and .c files generated using [Mustache](https://mustache.github.io) templates.  These can then be compiled into your program.
+
+The program defines constants for certain objects in the .h file.  For example, a tilemap will have constants defined for the pixel width, pixel height, tile width, tile height, and tile count (tile width * tile height).  These constants are automatically named based on the object name.
+
+Loading Graphics Data Using SGDK
+================================
+
+Palettes
+--------
+```
+PAL_setPalette(PAL0, PAL_FOREST, DMA_QUEUE);
+```
+
+Tilesets
+--------
+```
+// Leave tile 0 empty, load tileset starting at index 1.
+#define FOREST_TILESET_START_IDX 1
+
+VDP_loadTileData((const uint32_t*)TILESET_FOREST, FOREST_TILESET_START_IDX, TILESET_FOREST_TILE_COUNT, DMA_QUEUE);
+```
+
+Tilemaps
+--------
+```
+VDP_setTileMapDataRectEx(BG_A, TILEMAP_FOREST, TILE_ATTR_FULL(PAL0, 0, 0, 0, FOREST_TILESET_START_IDX), 0, 0, TILEMAP_FOREST_TILE_WIDTH, TILEMAP_FOREST_TILE_HEIGHT, TILEMAP_FOREST_TILE_WIDTH, DMA_QUEUE);
+```
+
+Tilemap arrays
+--------------
+```
+#define LEVEL_TILESET_START_IDX 33
+
+// Load level 2
+VDP_setTileMapDataRectEx(BG_A, TILEMAPARRAY_LEVELS[2], TILE_ATTR_FULL(PAL0, 0, 0, 0, LEVEL_TILESET_START_IDX), 0, 0, TILEMAPARRAY_LEVELS_TILE_WIDTH, TILEMAPARRAY_LEVELS_TILE_HEIGHT, TILEMAPARRAY_LEVELS_TILE_WIDTH, DMA_QUEUE);
+```
+
+Blockmaps
+---------
+```
+uint16_t blockX = 0;
+uint16_t blockY = 0;
+uint16_t tileX = 0;
+uint16_t tileY = 0;
+
+for (blockY = 0; blockY < BLOCKMAP_FOREST_BG_BLOCK_HEIGHT; blockY++)
+{
+    tileX = 0;
+
+    for (blockX = 0; blockX < BLOCKMAP_FOREST_BG_BLOCK_WIDTH; blockX++)
+    {
+        // Using DMA instead of DMA_QUEUE here -- too many things would be queued up at one time.
+        VDP_setTileMapDataRectEx(BG_A, TILEMAPARRAY_FOREST[BLOCKMAP_FOREST_BG[(blockY * BLOCKMAP_FOREST_BG_BLOCK_WIDTH) + blockX]], TILE_ATTR_FULL(PAL0, 0, 0, 0, FOREST_TILESET_START_IDX), tileX, tileY, BLOCKMAP_FOREST_BG_BLOCK_TILE_WIDTH, BLOCKMAP_FOREST_BG_BLOCK_TILE_HEIGHT, BLOCKMAP_FOREST_BG_BLOCK_TILE_WIDTH, DMA);
+        tileX += BLOCKMAP_FOREST_BG_BLOCK_TILE_WIDTH;
+    }
+
+    tileY += BLOCKMAP_FOREST_BG_BLOCK_TILE_HEIGHT;
+}
+```
+
+Sprites
+-------
+
+
+Sprite arrays
+-------------
+
