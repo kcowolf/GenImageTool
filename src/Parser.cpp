@@ -37,8 +37,8 @@ namespace GenImageTool
     {
         m_lineCounter = 0;
 
-        m_commands["blockmap"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseBlockMap };
-        m_commands["blockmap_8"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y W H", &Parser::parseBlockMap };
+        m_commands["blockmap"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H", &Parser::parseBlockMap };
+        m_commands["blockmap_8"] = CommandTableEntry{ 10, "blockmap BLOCKMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME TILEMAPARRAY_NAME X Y BLOCK_W BLOCK_H", &Parser::parseBlockMap };
         m_commands["image"] = CommandTableEntry{ -1, "", &Parser::parseImage };
         m_commands["out_h"] = CommandTableEntry{ 3, "out_h \"filename.h\" INCLUDE_GUARD", &Parser::parseOutputHFile };
         m_commands["out_c"] = CommandTableEntry{ 2, "out_c \"filename.c\"", &Parser::parseOutputCFile };
@@ -604,7 +604,7 @@ namespace GenImageTool
 
                         if (!tileAdded)
                         {
-                            throw std::runtime_error("BlockMap: Failed to add tile to tilemap.");
+                            throw std::runtime_error("BlockMap: Failed to add tile to tilemap, did not match specified palette/palette collection.");
                         }
                     }
                 }
@@ -681,7 +681,7 @@ namespace GenImageTool
         }
         else
         {
-            throw std::runtime_error("Failed to read sprite.");
+            throw std::runtime_error("Failed to read sprite tile, did not match specified palette/palette collection.");
         }
     }
 
@@ -724,7 +724,7 @@ namespace GenImageTool
 
                 if (!added)
                 {
-                    throw std::runtime_error("Failed to add tile to tilemap.");
+                    throw std::runtime_error("Failed to add tile to tilemap, did not match specified palette/palette collection.");
                 }
             }
         }
@@ -762,7 +762,7 @@ namespace GenImageTool
 
                 if (!added)
                 {
-                    throw std::runtime_error("Failed to add tile to tileset.");
+                    throw std::runtime_error("Failed to add tile to tileset, did not match specified palette/palette collection.");
                 }
             }
         }
