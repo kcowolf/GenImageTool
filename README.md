@@ -84,6 +84,8 @@ Color Palettes
 --------------
 Color palettes may contain a maximum of 16 colors.
 
+It's a good idea to add your transparency color using the palette_color command after creating a palette.  Otherwise, the transprency color will be the color of the first pixel read in the palette_colors command.
+
 **palette PALETTE_NAME**  
 Create a color palette.
 
@@ -95,7 +97,7 @@ Automatically read colors from the image; colors will be added to the palette if
 
 ```
 palette PAL_FOREST
-palette_color PAL_FOREST 224 0 224
+palette_color PAL_FOREST 224 0 224  # Transparency color
 palette_colors PAL_FOREST IMG_FOREST 0 0 320 224
 ```
 
