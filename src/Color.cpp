@@ -70,9 +70,9 @@ namespace GenImageTool
 
         std::stringstream stringstream;
         stringstream << "0";
-        stringstream << std::hex << (b / 16);
-        stringstream << std::hex << (g / 16);
-        stringstream << std::hex << (r / 16);
+        stringstream << std::uppercase << std::hex << (b / 16);
+        stringstream << std::uppercase << std::hex << (g / 16);
+        stringstream << std::uppercase << std::hex << (r / 16);
 
         m_genesisColor = stringstream.str();
     }

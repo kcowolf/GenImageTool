@@ -133,7 +133,7 @@ namespace GenImageTool
                     return false;
                 }
 
-                stringstream << std::hex << colorIndex;
+                stringstream << std::uppercase << std::hex << colorIndex;
             }
         }
 
