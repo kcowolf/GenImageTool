@@ -6,10 +6,12 @@ namespace GenImageTool
     TileMap::TileMap
         (
         std::size_t tileWidth,
-        std::size_t tileHeight
+        std::size_t tileHeight,
+        const TileSet& tileSet
         )
         : m_tileHeight(tileHeight)
         , m_tileWidth(tileWidth)
+        , m_tileSet(tileSet)
     {
         m_tileIndexes.reserve(m_tileWidth * m_tileHeight);
     }
@@ -59,6 +61,11 @@ namespace GenImageTool
     std::size_t TileMap::getTileWidth() const
     {
         return m_tileWidth;
+    }
+
+    const TileSet& TileMap::getTileSet() const
+    {
+        return m_tileSet;
     }
 
     bool TileMap::operator==(const TileMap& rhs) const

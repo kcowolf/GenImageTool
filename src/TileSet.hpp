@@ -10,6 +10,8 @@ namespace GenImageTool
     class TileSet
     {
     public:
+        TileSet();
+
         std::size_t addTile
             (
             const std::string& tile
@@ -33,12 +35,20 @@ namespace GenImageTool
 
         std::string getTile
             (
-            std::size_t index
+            std::size_t idx
             ) const;
+
+        uint16_t getStartIdx() const;
+
+        void setStartIdx
+            (
+            const uint16_t startIdx
+            );
 
     private:
         std::vector<std::string> m_tiles;
         std::map<std::string, std::size_t> m_tileTransformations;
+        std::uint16_t m_startIdx;
     };
 }
 

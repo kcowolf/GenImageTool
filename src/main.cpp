@@ -7,7 +7,7 @@
 #include "tclap/CmdLine.h"
 #include "Writer.hpp"
 
-constexpr const char* VERSION = "0.1.1";
+constexpr const char* VERSION = "0.2.0";
 
 int main(int argc, char* argv[])
 {

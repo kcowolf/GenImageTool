@@ -4,8 +4,8 @@
 
 const uint16_t GFX_PAL_1[16] =
 {
-    0x0e0e,
-    0x000e,
+    0x0E0E,
+    0x000E,
     0x0000,
     0x0000,
     0x0000,
@@ -24,8 +24,8 @@ const uint16_t GFX_PAL_1[16] =
 
 const uint16_t GFX_PAL_2[16] =
 {
-    0x0e0e,
-    0x00e0,
+    0x0E0E,
+    0x00E0,
     0x0000,
     0x0000,
     0x0000,
@@ -44,8 +44,8 @@ const uint16_t GFX_PAL_2[16] =
 
 const uint16_t GFX_PAL_3[16] =
 {
-    0x0e0e,
-    0x0e00,
+    0x0E0E,
+    0x0E00,
     0x0000,
     0x0000,
     0x0000,
@@ -64,8 +64,8 @@ const uint16_t GFX_PAL_3[16] =
 
 const uint16_t GFX_PAL_4[16] =
 {
-    0x0e0e,
-    0x0eee,
+    0x0E0E,
+    0x0EEE,
     0x0000,
     0x0000,
     0x0000,
@@ -142,6 +142,6 @@ const uint32_t GFX_TILESET_2[GFX_TILESET_2_TILE_COUNT][8] =
 
 const uint16_t GFX_TILEMAP_1[GFX_TILEMAP_1_TILE_COUNT] =
 {
-    0, 8192,
-    16384, 24576
+    0x0000, 0x2000,
+    0x4000, 0x6000
 };

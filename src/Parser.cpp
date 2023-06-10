@@ -11,6 +11,8 @@ namespace GenImageTool
     // out_h "filename.h" INCLUDE_GUARD
     // out_c "filename.c"
 
+    // library (SGDK or MDK)
+
     // image IMAGE_NAME "filename.png" {FIX_COLORS}
 
     // palette PALETTE_NAME
@@ -33,6 +35,10 @@ namespace GenImageTool
     // Add tiles to tileset without deduplication
     // tiles IMAGE_NAME PALETTE(_COLLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H
 
+    // Automatically calculate tileset start indexes (absolute or relative)
+    // tilesetStartIdx TILESET_NAME IDX
+    // tilesetStartIdx TILESET_NAME TILESET_NAME
+
     Parser::Parser()
     {
         m_lineCounter = 0;
@@ -54,6 +60,8 @@ namespace GenImageTool
         m_commands["tilemap_array_entry"] = CommandTableEntry{ 7, "tilemap_array_entry TILEMAPARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y", &Parser::parseTileMapArrayEntry };
         m_commands["tiles"] = CommandTableEntry{ 8, "tiles IMAGE_NAME PALETTE(_COLECTION)_NAME TILSET_NAME X Y TILE_W TILE_H", &Parser::parseTiles };
         m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME", &Parser::parseTileSet };
+        m_commands["tilesetStartIdx"] = CommandTableEntry{ 3, "tilesetStartIdx TILESET_NAME (IDX or TILESET_NAME)", &Parser::parseTileSetStartIdx };
+        m_commands["library"] = CommandTableEntry{ 2, "library (SGDK or MDK)", &Parser::parseLibrary };
     }
 
     GenesisObjects Parser::parse
@@ -292,6 +300,25 @@ namespace GenImageTool
         }
 
         m_genesisObjects.images.insert(std::pair(tokens[1], Image{ m_graphicsDir / tokens[2], fixColors }));
+    }
+
+    void Parser::parseLibrary
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        if (tokens[1] == "SGDK")
+        {
+            m_genesisObjects.library = SGDK;
+        }
+        else if (tokens[1] == "MDK")
+        {
+            m_genesisObjects.library = MDK;
+        }
+        else
+        {
+            throw std::runtime_error("Library " + tokens[1] + " not recognized.");
+        }
     }
 
     void Parser::parseOutputCFile
@@ -533,6 +560,24 @@ namespace GenImageTool
         m_genesisObjects.tileSets[tokens[1]] = TileSet();
     }
 
+    void Parser::parseTileSetStartIdx
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        TileSet& target = getTileSet(tokens[1]);
+
+        if (std::all_of(tokens[2].begin(), tokens[2].end(), ::isdigit))
+        {
+            target.setStartIdx(std::stoi(tokens[2]));
+        }
+        else
+        {
+            TileSet& source = getTileSet(tokens[2]);
+            target.setStartIdx(source.getStartIdx() + source.getSize());
+        }
+    }
+
     void Parser::parseTiles
         (
         const std::vector<std::string>& tokens
@@ -576,7 +621,7 @@ namespace GenImageTool
         {
             for (int mapI = 0; mapI < mapW; mapI++)
             {
-                TileMap tileMap{ tileMapArray.getTileWidth(), tileMapArray.getTileHeight() };
+                TileMap tileMap{ tileMapArray.getTileWidth(), tileMapArray.getTileHeight(), tileSet };
 
                 for (int tileJ = 0; tileJ < tileMap.getTileHeight(); tileJ++)
                 {
@@ -677,7 +722,7 @@ namespace GenImageTool
                 }
             }
 
-            return Sprite{ tileW, tileH, startTileIdx };
+            return Sprite{ tileW, tileH, startTileIdx, tileSet };
         }
         else
         {
@@ -696,7 +741,7 @@ namespace GenImageTool
         uint16_t tileH
         )
     {
-        TileMap tileMap{ tileW, tileH };
+        TileMap tileMap{ tileW, tileH, tileSet };
 
         for (int j = 0; j < tileH; j++)
         {

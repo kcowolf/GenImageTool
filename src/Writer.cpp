@@ -38,6 +38,14 @@ namespace GenImageTool
         kainjow::mustache::data data;
         data[HEADER_FILENAME_TAG] = genesisObjects.outputHFile.filename().string();
         data[INCLUDE_GUARD_TAG] = genesisObjects.includeGuard;
+        if (genesisObjects.library == SGDK)
+        {
+            data[LIBRARY_SGDK_TAG] = true;
+        }
+        else if (genesisObjects.library == MDK)
+        {
+            data[LIBRARY_MDK_TAG] = true;
+        }
         data[PALETTES_TAG] = getPaletteListData(genesisObjects.palettes);
         data[SPRITES_TAG] = getSpriteListData(genesisObjects.sprites);
         data[SPRITE_ARRAYS_TAG] = getSpriteArrayListData(genesisObjects.spriteArrays);
@@ -185,7 +193,7 @@ namespace GenImageTool
         data[TILE_HEIGHT_TAG] = std::to_string(sprite.getTileHeight());
         data[PIXEL_WIDTH_TAG] = std::to_string(sprite.getTileWidth() * TILE_PIXEL_WIDTH);
         data[PIXEL_HEIGHT_TAG] = std::to_string(sprite.getTileHeight() * TILE_PIXEL_HEIGHT);
-        data[SPRITE_TILE_TAG] = std::to_string(sprite.getStartTileIdx());
+        data[SPRITE_TILE_TAG] = std::to_string(sprite.getStartTileIdx() + (sprite.getTileSet().getStartIdx() != UINT16_MAX ? sprite.getTileSet().getStartIdx() : 0));
 
         return data;
     }
@@ -316,7 +324,7 @@ namespace GenImageTool
 
             for (std::size_t i = 0; i < tileMap.getTileWidth(); i++)
             {
-                row << "0x" << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << tileMap.getTileIndex(i, j);
+                row << "0x" << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << (tileMap.getTileIndex(i, j) + (tileMap.getTileSet().getStartIdx() != UINT16_MAX ? tileMap.getTileSet().getStartIdx() : 0));
 
                 if (i != tileMap.getTileWidth() - 1 || j != tileMap.getTileHeight() - 1)
                 {
@@ -362,6 +370,10 @@ namespace GenImageTool
         kainjow::mustache::data data;
         data[NAME_TAG] = name;
         data[TILE_COUNT_TAG] = std::to_string(tileSet.getSize());
+        if (tileSet.getStartIdx() != UINT16_MAX)
+        {
+            data[START_TILE_IDX_TAG] = std::to_string(tileSet.getStartIdx());
+        }
 
         kainjow::mustache::list tilesData;
 

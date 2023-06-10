@@ -13,11 +13,20 @@
 #include "TileMapArray.hpp"
 #include "TileSet.hpp"
 
+enum SDKLibrary
+{
+    SGDK,
+    MDK
+};
+
 struct GenesisObjects
 {
+    GenesisObjects();
+
     std::string includeGuard;
     std::filesystem::path outputCFile;
     std::filesystem::path outputHFile;
+    SDKLibrary library;
 
     std::map<std::string, GenImageTool::BlockMap> blockMaps;
     std::map<std::string, GenImageTool::Image> images;

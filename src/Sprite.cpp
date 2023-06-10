@@ -8,11 +8,13 @@ namespace GenImageTool
         (
         std::size_t tileWidth,
         std::size_t tileHeight,
-        std::size_t startTileIdx
+        std::size_t startTileIdx,
+        const TileSet& tileSet
         )
         : m_startTileIdx(startTileIdx)
         , m_tileHeight(tileHeight)
         , m_tileWidth(tileWidth)
+        , m_tileSet(tileSet)
     {
         if (m_tileWidth < SPRITE_MIN_DIMENSION || m_tileWidth > SPRITE_MAX_DIMENSION)
         {
@@ -38,5 +40,10 @@ namespace GenImageTool
     std::size_t Sprite::getTileWidth() const
     {
         return m_tileWidth;
+    }
+
+    const TileSet& Sprite::getTileSet() const
+    {
+        return m_tileSet;
     }
 }

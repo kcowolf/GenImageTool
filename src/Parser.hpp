@@ -96,6 +96,11 @@ namespace GenImageTool
             const std::vector<std::string>& tokens
             );
 
+        void parseLibrary
+            (
+            const std::vector<std::string>& tokens
+            );
+
         void parseOutputCFile
             (
             const std::vector<std::string>& tokens
@@ -127,6 +132,11 @@ namespace GenImageTool
             );
 
         void parseTileSet
+            (
+            const std::vector<std::string>& tokens
+            );
+
+        void parseTileSetStartIdx
             (
             const std::vector<std::string>& tokens
             );

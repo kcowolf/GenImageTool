@@ -4,9 +4,9 @@
 
 const uint16_t GFX_PAL_1[16] =
 {
-    0x0e0e,
-    0x0e20,
-    0x0eee,
+    0x0E0E,
+    0x0E20,
+    0x0EEE,
     0x0000,
     0x0000,
     0x0000,
@@ -49,23 +49,23 @@ const uint32_t GFX_TILESET_1[GFX_TILESET_1_TILE_COUNT][8] =
 const uint16_t GFX_TILEMAPARRAY_1[GFX_TILEMAPARRAY_1_TILEMAP_COUNT][GFX_TILEMAPARRAY_1_TILE_COUNT] =
 {
     {
-        0, 0,
-        0, 0
+        0x0000, 0x0000,
+        0x0000, 0x0000
     },
     {
-        1, 1,
-        1, 1
+        0x0001, 0x0001,
+        0x0001, 0x0001
     }
 };
 
 const uint16_t GFX_BLOCKMAP_1[GFX_BLOCKMAP_1_BLOCK_COUNT] =
 {
-    0, 1, 0, 1,
-    1, 0, 1, 0
+    0x0000, 0x0001, 0x0000, 0x0001,
+    0x0001, 0x0000, 0x0001, 0x0000
 };
 
 const uint8_t GFX_BLOCKMAP_2[GFX_BLOCKMAP_2_BLOCK_COUNT] =
 {
-    0, 1, 0, 1,
-    1, 0, 1, 0
+    0x00, 0x01, 0x00, 0x01,
+    0x01, 0x00, 0x01, 0x00
 };

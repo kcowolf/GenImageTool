@@ -4,11 +4,11 @@
 
 const uint16_t GFX_PAL_1[16] =
 {
-    0x0e0e,
-    0x000e,
-    0x00e0,
-    0x0e00,
-    0x0eee,
+    0x0E0E,
+    0x000E,
+    0x00E0,
+    0x0E00,
+    0x0EEE,
     0x0000,
     0x0000,
     0x0000,
@@ -152,6 +152,6 @@ const uint32_t GFX_TILESET_2[GFX_TILESET_2_TILE_COUNT][8] =
 
 const uint16_t GFX_TILEMAP_1[GFX_TILEMAP_1_TILE_COUNT] =
 {
-    0, 1,
-    2, 3
+    0x0000, 0x0001,
+    0x0002, 0x0003
 };

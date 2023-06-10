@@ -2,6 +2,8 @@
 #define TILEMAP_HPP
 
 #include <vector>
+#include "TileSet.hpp"
+
 namespace GenImageTool
 {
     class TileMap
@@ -10,7 +12,8 @@ namespace GenImageTool
         TileMap
             (
             std::size_t tileWidth,
-            std::size_t tileHeight
+            std::size_t tileHeight,
+            const TileSet& tileSet
             );
 
         void addTileIndex
@@ -28,12 +31,15 @@ namespace GenImageTool
 
         std::size_t getTileWidth() const;
 
+        const TileSet& getTileSet() const;
+
         bool operator==(const TileMap& rhs) const;
 
     private:
         std::size_t m_tileHeight;
         std::size_t m_tileWidth;
         std::vector<std::size_t> m_tileIndexes;
+        const TileSet& m_tileSet;
     };
 }
 

@@ -4,6 +4,11 @@
 
 namespace GenImageTool
 {
+    TileSet::TileSet()
+        : m_startIdx(UINT16_MAX)
+    {
+    }
+
     std::size_t TileSet::addTile
         (
         const std::string& tile
@@ -125,14 +130,27 @@ namespace GenImageTool
 
     std::string TileSet::getTile
         (
-        std::size_t index
+        std::size_t idx
         ) const
     {
-        if (index >= m_tiles.size())
+        if (idx >= m_tiles.size())
         {
             throw std::runtime_error("Invalid tile index.");
         }
 
-        return m_tiles[index];
+        return m_tiles[idx];
+    }
+
+    uint16_t TileSet::getStartIdx() const
+    {
+        return m_startIdx;
+    }
+
+    void TileSet::setStartIdx
+        (
+        const uint16_t startIdx
+        )
+    {
+        m_startIdx = startIdx;
     }
 }
