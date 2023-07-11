@@ -52,7 +52,7 @@ namespace GenImageTool
         m_commands["palette_color"] = CommandTableEntry{ 5, "palette_color PALETTE_NAME RED GREEN BLUE", &Parser::parsePaletteColor };
         m_commands["palette_colors"] = CommandTableEntry{ 7, "palette_colors PALETTE_NAME IMAGE_NAME X Y W H", &Parser::parsePaletteColors };
         m_commands["palette_collection"] = CommandTableEntry{ 6, "palette_collection PALETTE_COLLECTION_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME PALETTE_NAME (use ? to leave palette undefined, collection name must not match any palette name)", &Parser::parsePaletteCollection };
-        m_commands["sprite"] = CommandTableEntry{ 9, "sprite TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseSprite };
+        m_commands["sprite"] = CommandTableEntry{ 9, "sprite SPRITE_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseSprite };
         m_commands["sprite_array"] = CommandTableEntry{ 4, "sprite_array SPRITEARRAY_NAME TILE_W TILE_H", &Parser::parseSpriteArray };
         m_commands["sprite_array_entry"] = CommandTableEntry{ 7, "sprite_array_entry SPRITEARRAY_NAME IMAGE_NAME PALETTE_NAME TILESET_NAME X Y", &Parser::parseSpriteArrayEntry };
         m_commands["tilemap"] = CommandTableEntry{ 9, "tilemap TILEMAP_NAME IMAGE_NAME PALETTE(_COLLECTION)_NAME TILESET_NAME X Y TILE_W TILE_H", &Parser::parseTileMap };
