@@ -26,6 +26,17 @@ namespace GenImageTool
             const std::map<std::string, BlockMap>& blockMaps
             );
 
+        kainjow::mustache::data getCollisionBlockMapData
+            (
+            const std::string& name,
+            const CollisionBlockMap& collisionBlockMap
+            );
+
+        kainjow::mustache::list getCollisionBlockMapListData
+            (
+            const std::map<std::string, CollisionBlockMap>& collisionBlockMaps
+            );
+
         kainjow::mustache::data getPaletteData
             (
             const std::string& name,

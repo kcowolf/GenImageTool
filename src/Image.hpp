@@ -48,13 +48,13 @@ namespace GenImageTool
             std::string& tile
             ) const;
 
-    private:
         Color getPixel
             (
             unsigned int x,
             unsigned int y
             ) const;
 
+    private:
         SDL_Surface* m_surface;
         bool m_fixColors;
     };

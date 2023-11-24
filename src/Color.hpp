@@ -2,6 +2,7 @@
 #define COLOR_HPP
 
 #include <cstdint>
+#include <string>
 
 namespace GenImageTool
 {

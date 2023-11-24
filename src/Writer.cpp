@@ -53,6 +53,7 @@ namespace GenImageTool
         data[TILEMAP_ARRAYS_TAG] = getTileMapArrayListData(genesisObjects.tileMapArrays);
         data[BLOCKMAPS_TAG] = getBlockMapListData(genesisObjects.blockMaps);
         data[TILESETS_TAG] = getTileSetListData(genesisObjects.tileSets);
+        data[COLLISIONBLOCKMAPS_TAG] = getCollisionBlockMapListData(genesisObjects.collisionBlockMaps);
 
         MustacheContext<kainjow::mustache::mustache::string_type> ctx{ &data };
         kainjow::mustache::mustache hFileTemplate{ "{{> h_file}}" };
@@ -63,10 +64,10 @@ namespace GenImageTool
     }
 
     kainjow::mustache::data Writer::getBlockMapData
-    (
+        (
         const std::string& name,
         const BlockMap& blockMap
-    )
+        )
     {
         kainjow::mustache::data data;
         data[NAME_TAG] = name;
@@ -124,6 +125,63 @@ namespace GenImageTool
         }
 
         return blockMapsData;
+    }
+
+    kainjow::mustache::data Writer::getCollisionBlockMapData
+        (
+        const std::string& name,
+        const CollisionBlockMap& collisionBlockMap
+        )
+    {
+        kainjow::mustache::data data;
+        data[NAME_TAG] = name;
+        data[BLOCK_COUNT_TAG] = std::to_string(collisionBlockMap.getBlockHeight() * collisionBlockMap.getBlockWidth());
+        data[BLOCK_WIDTH_TAG] = std::to_string(collisionBlockMap.getBlockWidth());
+        data[BLOCK_HEIGHT_TAG] = std::to_string(collisionBlockMap.getBlockHeight());
+
+        kainjow::mustache::list rows;
+        for (std::size_t j = 0; j < collisionBlockMap.getBlockHeight(); j++)
+        {
+            kainjow::mustache::data rowData;
+            std::stringstream row;
+
+            for (std::size_t i = 0; i < collisionBlockMap.getBlockWidth(); i++)
+            {
+                row << "0x" << std::uppercase << std::setfill('0') << std::setw(4) << std::hex << collisionBlockMap.getCollisionBlockValue(i, j);
+
+                if (i != collisionBlockMap.getBlockWidth() - 1 || j != collisionBlockMap.getBlockHeight() - 1)
+                {
+                    row << ",";
+                }
+
+                if (i != collisionBlockMap.getBlockWidth() - 1)
+                {
+                    row << " ";
+                }
+            }
+
+            rowData[ROW_TAG] = row.str();
+            rows.push_back(rowData);
+        }
+
+        data[ROWS_TAG] = rows;
+
+        return data;
+    }
+
+    kainjow::mustache::list Writer::getCollisionBlockMapListData
+        (
+        const std::map<std::string, CollisionBlockMap>& collisionBlockMaps
+        )
+    {
+        kainjow::mustache::list collisionBlockMapsData;
+
+        for (std::map<std::string, CollisionBlockMap>::const_iterator it = collisionBlockMaps.begin(); it != collisionBlockMaps.end(); ++it)
+        {
+            collisionBlockMapsData.push_back(getCollisionBlockMapData(it->first, it->second));
+        }
+
+        return collisionBlockMapsData;
     }
 
     kainjow::mustache::data Writer::getPaletteData

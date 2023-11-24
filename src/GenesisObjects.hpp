@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 #include "BlockMap.hpp"
+#include "CollisionBlockMap.hpp"
+#include "CollisionBlockSet.hpp"
 #include "Image.hpp"
 #include "Palette.hpp"
 #include "Sprite.hpp"
@@ -29,6 +31,8 @@ struct GenesisObjects
     SDKLibrary library;
 
     std::map<std::string, GenImageTool::BlockMap> blockMaps;
+    std::map<std::string, GenImageTool::CollisionBlockMap> collisionBlockMaps;
+    std::map<std::string, GenImageTool::CollisionBlockSet> collisionBlockSets;
     std::map<std::string, GenImageTool::Image> images;
     std::map<std::string, GenImageTool::Palette> palettes;
     std::map<std::string, std::map<std::size_t, GenImageTool::Palette&>> paletteCollections;
