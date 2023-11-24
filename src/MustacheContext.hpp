@@ -18,6 +18,7 @@ namespace GenImageTool
             addPartial("indent", INDENT_TEMPLATE);
 
             addPartial("h_blockmap", H_BLOCKMAP_TEMPLATE);
+            addPartial("h_collisionblockmap", H_COLLISIONBLOCKMAP_TEMPLATE);
             addPartial("h_file", H_FILE_TEMPLATE);
             addPartial("h_palette", H_PALETTE_TEMPLATE);
             addPartial("h_sprite", H_SPRITE_TEMPLATE);
@@ -27,6 +28,7 @@ namespace GenImageTool
             addPartial("h_tileset", H_TILESET_TEMPLATE);
 
             addPartial("c_blockmap", C_BLOCKMAP_TEMPLATE);
+            addPartial("c_collisionblockmap", C_COLLISIONBLOCKMAP_TEMPLATE);
             addPartial("c_file", C_FILE_TEMPLATE);
             addPartial("c_palette", C_PALETTE_TEMPLATE);
             addPartial("c_spritearray", C_SPRITEARRAY_TEMPLATE);

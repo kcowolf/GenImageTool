@@ -1,0 +1,19 @@
+# out_h "filename.h" INCLUDE_GUARD
+out_h "testCollision.h" TESTCOLLISION_H
+
+# out_c "filename.c"
+out_c "testCollision.c"
+
+# image IMAGE_NAME "filename.png" {FIX_COLORS}
+image GFX_IMG_1 "testCollision.png"
+
+# collision_block_set COLLISIONBLOCKSET_NAME W H
+collision_block_set COLLISION_BLOCKS 16 16
+
+# collision_block COLLISIONBLOCKSET_NAME IMAGE_NAME X Y INTEGER_VALUE
+collision_block COLLISION_BLOCKS GFX_IMG_1 0 0 0
+collision_block COLLISION_BLOCKS GFX_IMG_1 16 0 1
+collision_block COLLISION_BLOCKS GFX_IMG_1 32 0 2
+
+# collision_blockmap COLLISIONBLOCKMAP_NAME IMAGE_NAME COLLISIONBLOCKSET_NAME X Y BLOCK_W BLOCK_H
+collision_blockmap COLLISIONBLOCKMAP GFX_IMG_1 COLLISION_BLOCKS 0 16 4 4

@@ -154,6 +154,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CollisionBlock.cpp" />
+    <ClCompile Include="src\CollisionBlockMap.cpp" />
+    <ClCompile Include="src\CollisionBlockSet.cpp" />
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\GenesisObjects.cpp" />
     <ClCompile Include="src\Image.cpp" />
@@ -169,6 +172,9 @@
     <ClCompile Include="src\Writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CollisionBlock.hpp" />
+    <ClInclude Include="src\CollisionBlockMap.hpp" />
+    <ClInclude Include="src\CollisionBlockSet.hpp" />
     <ClInclude Include="src\Color.hpp" />
     <ClInclude Include="src\Genesis.hpp" />
     <ClInclude Include="src\GenesisObjects.hpp" />

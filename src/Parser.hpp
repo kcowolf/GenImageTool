@@ -48,6 +48,11 @@ namespace GenImageTool
 
         GenesisObjects m_genesisObjects;
 
+        CollisionBlockSet& getCollisionBlockSet
+            (
+            const std::string& name
+            );
+
         std::string getErrorPrefix();
 
         Image& getImage
@@ -87,6 +92,21 @@ namespace GenImageTool
             );
 
         void parseBlockMap
+            (
+            const std::vector<std::string>& tokens
+            );
+
+        void parseCollisionBlock
+            (
+            const std::vector<std::string>& tokens
+            );
+        
+        void parseCollisionBlockMap
+            (
+            const std::vector<std::string>& tokens
+            );
+
+        void parseCollisionBlockSet
             (
             const std::vector<std::string>& tokens
             );
@@ -187,6 +207,24 @@ namespace GenImageTool
             uint16_t mapW,
             uint16_t mapH,
             bool useShortIndexes
+            );
+
+        CollisionBlock readCollisionBlock
+            (
+            Image& image,
+            CollisionBlockSet& collisionBlockSet,
+            uint16_t x,
+            uint16_t y
+            );
+
+        CollisionBlockMap readCollisionBlockMap
+            (
+            Image& image,
+            CollisionBlockSet& collisionBlockSet,
+            uint16_t x,
+            uint16_t y,
+            uint16_t blockW,
+            uint16_t blockH
             );
 
         Sprite readSprite

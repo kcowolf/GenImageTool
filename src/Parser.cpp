@@ -62,6 +62,9 @@ namespace GenImageTool
         m_commands["tileset"] = CommandTableEntry{ 2, "tileset TILESET_NAME", &Parser::parseTileSet };
         m_commands["tilesetStartIdx"] = CommandTableEntry{ 3, "tilesetStartIdx TILESET_NAME (IDX or TILESET_NAME)", &Parser::parseTileSetStartIdx };
         m_commands["library"] = CommandTableEntry{ 2, "library (SGDK or MDK)", &Parser::parseLibrary };
+        m_commands["collision_block_set"] = CommandTableEntry{ 4, "collision_block_set COLLISIONBLOCKSET_NAME W H", &Parser::parseCollisionBlockSet };
+        m_commands["collision_block"] = CommandTableEntry{ 6, "collision_block COLLISIONBLOCKSET_NAME IMAGE_NAME X Y INTEGER_VALUE", &Parser::parseCollisionBlock };
+        m_commands["collision_blockmap"] = CommandTableEntry{ 8, "collision_blockmap COLLISIONBLOCKMAP_NAME IMAGE_NAME COLLISIONBLOCKSET_NAME X Y BLOCK_W BLOCK_H", &Parser::parseCollisionBlockMap };
     }
 
     GenesisObjects Parser::parse
@@ -124,6 +127,21 @@ namespace GenImageTool
         }
 
         return m_genesisObjects;
+    }
+
+    CollisionBlockSet& Parser::getCollisionBlockSet
+        (
+        const std::string& name
+        )
+    {
+        std::map<std::string, CollisionBlockSet>::iterator collisionBlockSet = m_genesisObjects.collisionBlockSets.find(name);
+
+        if (collisionBlockSet == m_genesisObjects.collisionBlockSets.end())
+        {
+            throw std::runtime_error("CollisionBlockSet " + name + " does not exist.");
+        }
+
+        return collisionBlockSet->second;
     }
 
     std::string Parser::getErrorPrefix()
@@ -280,6 +298,56 @@ namespace GenImageTool
 
         BlockMap blockMap = readBlockMap(image, palettes, tileSet, tileMapArray, x, y, mapW, mapH, useShortIndexes);
         m_genesisObjects.blockMaps.insert(std::pair<std::string, BlockMap>(tokens[1], blockMap));
+    }
+
+    void Parser::parseCollisionBlock
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        CollisionBlockSet& collisionBlockSet = getCollisionBlockSet(tokens[1]);
+        Image& image = getImage(tokens[2]);
+
+        CollisionBlock collisionBlock = readCollisionBlock(image, collisionBlockSet, static_cast<uint16_t>(std::stoi(tokens[3])), static_cast<uint16_t>(std::stoi(tokens[4])));
+
+        collisionBlockSet.addBlock(collisionBlock, static_cast<uint16_t>(std::stoi(tokens[5])));
+    }
+
+    void Parser::parseCollisionBlockMap
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        // collision_blockmap COLLISIONBLOCKMAP_NAME IMAGE_NAME COLLISIONBLOCKSET_NAME X Y BLOCK_W BLOCK_H
+
+        if (m_genesisObjects.collisionBlockMaps.find(tokens[1]) != m_genesisObjects.collisionBlockMaps.end())
+        {
+            throw std::runtime_error("CollisionBlockMap " + tokens[1] + " already exists.");
+        }
+
+        Image& image = getImage(tokens[2]);
+        CollisionBlockSet& collisionBlockSet = getCollisionBlockSet(tokens[3]);
+
+        uint16_t x = std::stoi(tokens[4]);
+        uint16_t y = std::stoi(tokens[5]);
+        uint16_t blockW = std::stoi(tokens[6]);
+        uint16_t blockH = std::stoi(tokens[7]);
+
+        CollisionBlockMap collisionBlockMap = readCollisionBlockMap(image, collisionBlockSet, x, y, blockW, blockH);
+        m_genesisObjects.collisionBlockMaps.insert(std::pair<std::string, CollisionBlockMap>(tokens[1], collisionBlockMap));
+    }
+
+    void Parser::parseCollisionBlockSet
+        (
+        const std::vector<std::string>& tokens
+        )
+    {
+        if (m_genesisObjects.collisionBlockSets.find(tokens[1]) != m_genesisObjects.collisionBlockSets.end())
+        {
+            throw std::runtime_error("CollisionBlockSet " + tokens[1] + " already exists.");
+        }
+
+        m_genesisObjects.collisionBlockSets.insert(std::pair<std::string, CollisionBlockSet>(tokens[1], CollisionBlockSet{ static_cast<uint16_t>(std::stoi(tokens[2])), static_cast<uint16_t>(std::stoi(tokens[3])) }));
     }
 
     void Parser::parseImage
@@ -665,6 +733,58 @@ namespace GenImageTool
         }
 
         return blockMap;
+    }
+
+    CollisionBlock Parser::readCollisionBlock
+        (
+        Image& image,
+        CollisionBlockSet& collisionBlockSet,
+        uint16_t x,
+        uint16_t y
+        )
+    {
+        std::vector<Color> colors;
+
+        for (std::size_t j = 0; j < collisionBlockSet.getHeight(); j++)
+        {
+            for (std::size_t i = 0; i < collisionBlockSet.getWidth(); i++)
+            {
+                colors.push_back(image.getPixel(x + i, y + j));
+            }
+        }
+
+        return CollisionBlock{ colors };
+    }
+
+    CollisionBlockMap Parser::readCollisionBlockMap
+        (
+        Image& image,
+        CollisionBlockSet& collisionBlockSet,
+        uint16_t x,
+        uint16_t y,
+        uint16_t blockW,
+        uint16_t blockH
+        )
+    {
+        CollisionBlockMap collisionBlockMap{ blockW, blockH };
+
+        for (int j = 0; j < blockH; j++)
+        {
+            for (int i = 0; i < blockW; i++)
+            {
+                uint16_t value;
+
+                CollisionBlock collisionBlock = readCollisionBlock(image, collisionBlockSet, x + (i * collisionBlockSet.getWidth()), y + (j * collisionBlockSet.getWidth()));
+                if (!collisionBlockSet.find(collisionBlock, value))
+                {
+                    throw std::runtime_error("CollisionBlock not found in CollisionBlockSet.");
+                }
+
+                collisionBlockMap.addCollisionBlockValue(value);
+            }
+        }
+
+        return collisionBlockMap;
     }
 
     Sprite Parser::readSprite
