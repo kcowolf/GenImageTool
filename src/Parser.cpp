@@ -801,6 +801,7 @@ namespace GenImageTool
         bool added = false;
 
         TileSet spriteTileSet;
+        std::size_t paletteIdx = 0;
 
         for (std::map<std::size_t, Palette&>::iterator it = palettes.begin(); !added && it != palettes.end(); ++it)
         {
@@ -815,6 +816,7 @@ namespace GenImageTool
                     if (image.readTile(x + (i * TILE_PIXEL_WIDTH), y + (j * TILE_PIXEL_HEIGHT), it->second, tile))
                     {
                         spriteTileSet.addTile(tile);
+                        paletteIdx = it->first;
                     }
                     else
                     {
@@ -842,7 +844,7 @@ namespace GenImageTool
                 }
             }
 
-            return Sprite{ tileW, tileH, startTileIdx, tileSet };
+            return Sprite{ tileW, tileH, startTileIdx | paletteIdx, tileSet };
         }
         else
         {
