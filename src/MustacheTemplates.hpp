@@ -29,6 +29,7 @@ constexpr const char* SPRITES_TAG = "SPRITES";
 constexpr const char* START_TILE_IDX_TAG = "START_TILE_IDX";
 constexpr const char* TILE_COUNT_TAG = "TILE_COUNT";
 constexpr const char* TILE_HEIGHT_TAG = "TILE_HEIGHT";
+constexpr const char* TILE_SIZE_TAG = "TILE_SIZE";
 constexpr const char* TILE_WIDTH_TAG = "TILE_WIDTH";
 constexpr const char* TILEMAP_ARRAYS_TAG = "TILEMAPARRAYS";
 constexpr const char* TILEMAP_COUNT_TAG = "TILEMAP_COUNT";
@@ -186,6 +187,7 @@ constexpr const char* H_SPRITE_TEMPLATE = R"(
 
 #define {{NAME}}_TILE_WIDTH {{TILE_WIDTH}}
 #define {{NAME}}_TILE_HEIGHT {{TILE_HEIGHT}}
+#define {{NAME}}_TILE_SIZE {{TILE_SIZE}}
 #define {{NAME}}_PIXEL_WIDTH {{PIXEL_WIDTH}}
 #define {{NAME}}_PIXEL_HEIGHT {{PIXEL_HEIGHT}}
 #define {{NAME}}_TILE_COUNT {{TILE_COUNT}}
@@ -198,6 +200,7 @@ constexpr const char* H_SPRITEARRAY_TEMPLATE = R"(
 
 #define {{NAME}}_TILE_WIDTH {{TILE_WIDTH}}
 #define {{NAME}}_TILE_HEIGHT {{TILE_HEIGHT}}
+#define {{NAME}}_TILE_SIZE {{TILE_SIZE}}
 #define {{NAME}}_PIXEL_WIDTH {{PIXEL_WIDTH}}
 #define {{NAME}}_PIXEL_HEIGHT {{PIXEL_HEIGHT}}
 #define {{NAME}}_TILE_COUNT {{TILE_COUNT}}

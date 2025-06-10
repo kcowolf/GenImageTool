@@ -249,6 +249,7 @@ namespace GenImageTool
         data[TILE_COUNT_TAG] = std::to_string(sprite.getTileHeight() * sprite.getTileWidth());
         data[TILE_WIDTH_TAG] = std::to_string(sprite.getTileWidth());
         data[TILE_HEIGHT_TAG] = std::to_string(sprite.getTileHeight());
+        data[TILE_SIZE_TAG] = std::to_string((((sprite.getTileHeight() - 1) & 0x3) | (((sprite.getTileWidth() - 1) & 0x3) << 2)));
         data[PIXEL_WIDTH_TAG] = std::to_string(sprite.getTileWidth() * TILE_PIXEL_WIDTH);
         data[PIXEL_HEIGHT_TAG] = std::to_string(sprite.getTileHeight() * TILE_PIXEL_HEIGHT);
         data[SPRITE_TILE_TAG] = std::to_string(sprite.getStartTileIdx() + (sprite.getTileSet().getStartIdx() != UINT16_MAX ? sprite.getTileSet().getStartIdx() : 0));
@@ -268,6 +269,7 @@ namespace GenImageTool
         data[TILE_COUNT_TAG] = std::to_string(spriteArray.getTileHeight() * spriteArray.getTileWidth());
         data[TILE_WIDTH_TAG] = std::to_string(spriteArray.getTileWidth());
         data[TILE_HEIGHT_TAG] = std::to_string(spriteArray.getTileHeight());
+        data[TILE_SIZE_TAG] = std::to_string((((spriteArray.getTileHeight() - 1) & 0x3) | (((spriteArray.getTileWidth() - 1) & 0x3) << 2)));
         data[PIXEL_WIDTH_TAG] = std::to_string(spriteArray.getTileWidth() * TILE_PIXEL_WIDTH);
         data[PIXEL_HEIGHT_TAG] = std::to_string(spriteArray.getTileHeight() * TILE_PIXEL_HEIGHT);
 
